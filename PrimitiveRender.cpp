@@ -197,13 +197,9 @@ void PrimitiveRenderer::floodFill0(int sx, int sy, sf::Color fillColor, sf::Colo
     int h = target->getSize().y;
     if (sx < 0 || sy < 0 || sx >= w || sy >= h) return;
 
-    // Dla sf::RenderTexture musimy użyć innego podejścia
-    // Ponieważ nie możemy bezpośrednio zaktualizować tekstury w trakcie rysowania
-    // Używamy tymczasowej tekstury
     sf::Texture tex;
     tex.create(w, h);
 
-    // Pobierz aktualną zawartość target jako obraz
     sf::Image img;
     if (dynamic_cast<sf::RenderWindow*>(target)) {
         tex.update(*dynamic_cast<sf::RenderWindow*>(target));
@@ -235,7 +231,6 @@ void PrimitiveRenderer::floodFill0(int sx, int sy, sf::Color fillColor, sf::Colo
         queue.push({x, y - 1});
     }
 
-    // Utwórz teksturę z wypełnionym obrazem i narysuj ją
     sf::Texture filledTexture;
     filledTexture.loadFromImage(img);
     sf::Sprite filledSprite(filledTexture);
@@ -249,7 +244,6 @@ void PrimitiveRenderer::boundaryFillIterative0(int sx, int sy, sf::Color fillCol
     int h = target->getSize().y;
     if (sx < 0 || sy < 0 || sx >= w || sy >= h) return;
 
-    // Podobne podejście jak w floodFill
     sf::Texture tex;
     tex.create(w, h);
 

@@ -6,7 +6,7 @@
 
 class PrimitiveRenderer {
 private:
-    sf::RenderTarget* target;  // Zmiana z RenderWindow na RenderTarget
+    sf::RenderTarget* target;
 
 public:
     PrimitiveRenderer(sf::RenderTarget* target = nullptr);

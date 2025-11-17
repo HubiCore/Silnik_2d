@@ -42,7 +42,6 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
 
     renderer.floodFill0(200, 400, sf::Color(0, 255, 255, 150), sf::Color::Green);
 
-
 }
 
 int main()
@@ -64,7 +63,6 @@ int main()
 
     PrimitiveRenderer renderer(window);
 
-    // Tworzymy bufor RenderTexture
     sf::RenderTexture buffer;
     if (!buffer.create(800, 600)) {
         engine.log("ERROR: Unable to create RenderTexture!");
@@ -90,7 +88,6 @@ int main()
 
                 engine.log("Mouse click at: " + std::to_string(mx) + ", " + std::to_string(my));
 
-                // Wyczyść bufor i narysuj wszystkie figury
                 buffer.clear(sf::Color(50, 50, 50));
                 PrimitiveRenderer bufferRenderer(&buffer);
                 drawAllFigures(bufferRenderer);
@@ -106,7 +103,7 @@ int main()
                     bufferRenderer.boundaryFillIterative0(mx, my, sf::Color::Yellow, sf::Color::Red);
                 }
 
-                buffer.display(); // zapis do tekstury
+                buffer.display();
             }
 
             if (event.type == sf::Event::KeyPressed)
@@ -124,7 +121,6 @@ int main()
             }
         }
 
-        // Pierwsze narysowanie sceny
         if (firstFrame) {
             buffer.clear(sf::Color(50, 50, 50));
             PrimitiveRenderer bufferRenderer(&buffer);
@@ -133,7 +129,6 @@ int main()
             firstFrame = false;
         }
 
-        // Wyświetlamy zawartość bufora w oknie
         window->clear();
         sf::Sprite sprite(buffer.getTexture());
         window->draw(sprite);
