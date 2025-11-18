@@ -18,6 +18,11 @@ add_executable(PGK main.cpp
         LineSegment.cpp
         LineSegment.hpp
         GameObjects.cpp
-        GameObjects.hpp)
+        GameObjects.hpp
+        UpdatableObject.hpp
+        DrawableObject.hpp
+        TransformableObject.hpp
+        ShapeObject.hpp
+        Player.hpp)
 
 target_link_libraries(PGK PRIVATE sfml-system sfml-window sfml-graphics sfml-audio)
