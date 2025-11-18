@@ -22,7 +22,6 @@ bool Engine::init(const std::string& title, unsigned int screenWidth, unsigned i
         return false;
     }
 
-
     unsigned int style = fullscreen ? sf::Style::Fullscreen : sf::Style::Default;
     window.create(mode, title, style);
 
@@ -56,7 +55,6 @@ void Engine::enableKeyboard(bool enable) {
     keyboardEnabled = enable;
     log(std::string("Keyboard ") + (enable ? "enabled" : "disabled"));
 }
-
 
 void Engine::mainLoop() {
     if (!window.isOpen()) {
@@ -97,9 +95,6 @@ void Engine::mainLoop() {
     shutdown();
 }
 
-
-
-
 void Engine::shutdown() {
     if (window.isOpen()) {
         window.close();
@@ -117,5 +112,3 @@ void Engine::log(const std::string& message) {
         logFile << "[Engine]" << message << std::endl;
     }
 }
-
-
