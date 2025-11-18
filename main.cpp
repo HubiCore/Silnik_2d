@@ -15,10 +15,15 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
         {300, 100}, {400, 150}, {450, 250}, {350, 300}, {100, 300}
     };
 
-    p1.draw(renderer, sf::Color::Yellow);
+    p1.setColor(sf::Color::Yellow);
+    p1.draw(renderer);
+
     renderer.drawPoint(150, 150, sf::Color::White);
 
-    line.draw(renderer, false, sf::Color::Red);
+
+    line.setColor(sf::Color::Red);
+    line.draw(renderer);
+
     renderer.drawLine(250, 100, 400, 200, sf::Color::Green);
     renderer.drawLineIncremental(400, 100, 550, 200, sf::Color::Cyan);
 

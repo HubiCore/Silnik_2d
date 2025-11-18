@@ -1,7 +1,7 @@
 #ifndef DRAWABLEOBJECT_HPP
 #define DRAWABLEOBJECT_HPP
 
-#include "GameObject.hpp"
+#include "GameObjects.hpp"
 #include "PrimitiveRenderer.hpp"
 
 class DrawableObject : public virtual GameObject {

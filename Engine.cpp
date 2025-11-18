@@ -86,8 +86,12 @@ void Engine::mainLoop() {
         }
 
         window.clear(clearColor);
-        point.draw(renderer, sf::Color::Green);
-        line.draw(renderer, false, sf::Color::Red);
+        point.setColor(sf::Color::Green);
+        point.draw(renderer);
+
+        line.setColor(sf::Color::Red);
+        line.draw(renderer);
+
         window.display();
     }
 
