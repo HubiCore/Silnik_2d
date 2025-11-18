@@ -35,7 +35,7 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
 
     renderer.drawPolygon(3, 60, {200, 400}, 0, sf::Color::Red);
     renderer.drawPolygon(4, 80, {350, 400}, M_PI / 4, sf::Color::Green);
-    renderer.drawPolygon(6, 50, {500, 400}, 0, sf::Color::Cyan);
+    renderer.drawPolygon(6, 50, {500, 400}, 0, sf::Color::Red);
 
     renderer.drawPolygon(5, 80, {1300, 300}, 0, sf::Color::Red);
     renderer.drawPolygon(5, 100, {1000, 300}, 0, sf::Color::Red);
@@ -48,7 +48,7 @@ int main()
 {
     Engine engine;
 
-    if (!engine.init("Simple engine", 800, 600, false, 144))
+    if (!engine.init("Simple engine", 800, 600, true, 144))
         return -1;
 
     engine.setClearColor(sf::Color(50, 50, 50));
