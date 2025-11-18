@@ -2,28 +2,64 @@
 #include "PrimitiveRenderer.hpp"
 #include "Point2D.hpp"
 #include "LineSegment.hpp"
+#include "Player.hpp"
 #include <vector>
 #include <cmath>
 
-void drawAllFigures(PrimitiveRenderer& renderer) {
+// Rozszerzone klasy z obsługą kolorów i PrimitiveRenderer
+class DrawablePoint2D : public Point2D {
+private:
+    sf::Color color;
 
-    Point2D p1(100, 100);
-    Point2D p2(200, 200);
-    LineSegment line(p1, p2);
+public:
+    DrawablePoint2D(float x = 0, float y = 0, sf::Color color = sf::Color::White)
+        : Point2D(x, y), color(color) {}
+
+    void setColor(sf::Color newColor) { color = newColor; }
+    sf::Color getColor() const { return color; }
+
+    void draw(PrimitiveRenderer& renderer) const {
+        renderer.drawPoint(getX(), getY(), color);
+    }
+};
+
+class DrawableLineSegment : public LineSegment {
+private:
+    sf::Color color;
+
+public:
+    DrawableLineSegment(const Point2D& p1, const Point2D& p2, sf::Color color = sf::Color::White)
+        : LineSegment(p1, p2), color(color) {}
+
+    void setColor(sf::Color newColor) { color = newColor; }
+    sf::Color getColor() const { return color; }
+
+    void draw(PrimitiveRenderer& renderer) const {
+        // Używamy bezpośrednio współrzędnych punktów
+        renderer.drawLine(getP1().getX(), getP1().getY(), getP2().getX(), getP2().getY(), color);
+    }
+};
+
+void drawAllFigures(PrimitiveRenderer& renderer) {
+    // Tworzenie figur z użyciem rozszerzonych klas
+    DrawablePoint2D p1(100, 100, sf::Color::Yellow);
+    DrawablePoint2D p2(200, 200, sf::Color::White);
+    DrawableLineSegment line(p1, p2, sf::Color::Red);
+
+    static Player player(400, 300, sf::Color::Cyan, 3.0f);
+    player.update(0.016f); // Dla 60 FPS
+    player.draw(renderer);
 
     std::vector<sf::Vector2f> polylinePoints = {
         {300, 100}, {400, 150}, {450, 250}, {350, 300}, {100, 300}
     };
 
-    p1.setColor(sf::Color::Yellow);
+    // Rysowanie punktów i linii
     p1.draw(renderer);
-
     renderer.drawPoint(150, 150, sf::Color::White);
-
-
-    line.setColor(sf::Color::Red);
     line.draw(renderer);
 
+    // Pozostałe elementy z oryginalnej funkcji
     renderer.drawLine(250, 100, 400, 200, sf::Color::Green);
     renderer.drawLineIncremental(400, 100, 550, 200, sf::Color::Cyan);
 
@@ -46,7 +82,6 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
     renderer.drawPolygon(5, 100, {1000, 300}, 0, sf::Color::Red);
 
     renderer.floodFill0(200, 400, sf::Color(0, 255, 255, 150), sf::Color::Green);
-
 }
 
 int main()
@@ -76,10 +111,18 @@ int main()
 
     engine.log("Custom main loop started.");
 
+    // Tworzenie gracza
+    Player player(400, 300, sf::Color::Cyan, 3.0f);
+
+    // Zegar do pomiaru czasu między klatkami
+    sf::Clock clock;
     bool firstFrame = true;
 
     while (window->isOpen())
     {
+        // Oblicz czas od ostatniej klatki
+        float deltaTime = clock.restart().asSeconds();
+
         sf::Event event;
         while (window->pollEvent(event))
         {
@@ -95,7 +138,7 @@ int main()
 
                 buffer.clear(sf::Color(50, 50, 50));
                 PrimitiveRenderer bufferRenderer(&buffer);
-                drawAllFigures(bufferRenderer);
+                drawAllFigures(bufferRenderer); // Fixed: removed player parameter
 
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
@@ -120,20 +163,24 @@ int main()
                 {
                     buffer.clear(sf::Color(50, 50, 50));
                     PrimitiveRenderer bufferRenderer(&buffer);
-                    drawAllFigures(bufferRenderer);
+                    drawAllFigures(bufferRenderer); // Fixed: removed player parameter
                     buffer.display();
                 }
             }
         }
 
+        // WAŻNE: Aktualizuj gracza w każdej klatce!
+        player.update(deltaTime);
+
         if (firstFrame) {
             buffer.clear(sf::Color(50, 50, 50));
             PrimitiveRenderer bufferRenderer(&buffer);
-            drawAllFigures(bufferRenderer);
+            drawAllFigures(bufferRenderer); // Fixed: removed player parameter
             buffer.display();
             firstFrame = false;
         }
 
+        // Rysuj aktualną scenę w każdej klatce
         window->clear();
         sf::Sprite sprite(buffer.getTexture());
         window->draw(sprite);
