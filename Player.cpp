@@ -25,7 +25,7 @@ void Player::update() {
         rotate(-15);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-        rotate(15);
+        rotate(15);//siema jestem skibidi sigma piotruś i lubie w dupe
     }
 }
 
