@@ -7,7 +7,7 @@
 class Player : public SpriteObject {
 public:
     Player() = default;
-    explicit Player(const sf::Texture& texture, float startX = 0.f, float startY = 0.f, float speed = 5.0f);
+    explicit Player(const sf::Texture& texture, float startX = 0.f, float startY = 0.f, float speed = 2.0f);
 
     std::string getType() const override { return "Player"; }
 
@@ -20,7 +20,7 @@ public:
     sf::FloatRect getGlobalBounds() const;
 
 private:
-    float speed = 5.0f;
+    float speed = 2.0f;
 };
 
 #endif

@@ -22,10 +22,10 @@ void Player::update() {
         translate(speed, 0);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-        rotate(-45);
+        rotate(-15);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-        rotate(45);
+        rotate(15);
     }
 }
 

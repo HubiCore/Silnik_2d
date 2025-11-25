@@ -28,6 +28,7 @@ public:
 
     // Helpers
     void setTexture(const sf::Texture& tex);
+    const sf::Sprite& getSprite() const { return sprite; }
     sf::Sprite& getSprite() { return sprite; }
 };
 
