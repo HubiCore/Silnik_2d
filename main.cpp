@@ -188,7 +188,12 @@ int main()
                 */
             }
         }
-        update_frame(buffer, player);
+
+        buffer.clear(sf::Color(50, 50, 50));
+        PrimitiveRenderer bufferRenderer(&buffer);
+        drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
+        buffer.display();
+
         if (firstFrame) {
             buffer.clear(sf::Color(50, 50, 50));
             PrimitiveRenderer bufferRenderer(&buffer);
