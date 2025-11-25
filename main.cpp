@@ -80,6 +80,14 @@ void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
     // Rysowanie gracza
     player.draw(renderer);
 }
+void update_frame(sf::RenderTexture buffer, Player player) {
+    buffer.clear(sf::Color(50, 50, 50));
+    PrimitiveRenderer bufferRenderer(&buffer);
+    drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
+    buffer.display();
+}
+
+
 
 int main()
 {
@@ -169,13 +177,15 @@ int main()
                 engine.log("Key pressed: " + std::to_string(event.key.code));
                 if (event.key.code == sf::Keyboard::Escape) //<-wyłączanie
                     window->close();
+                /*
                 else if (event.key.code == sf::Keyboard::R)
-                {
+                { //w tym elfe aktualizowanie
                     buffer.clear(sf::Color(50, 50, 50));
                     PrimitiveRenderer bufferRenderer(&buffer);
                     drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
                     buffer.display();
                 }
+                */
             }
         }
         update_frame(buffer, player);
