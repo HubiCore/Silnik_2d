@@ -6,6 +6,5 @@ Player::Player(const sf::Texture& texture)
 }
 
 void Player::update() {
-    // Przykład – możesz tu dodać sterowanie
-    // translate(1.f, 0.f);
+
 }

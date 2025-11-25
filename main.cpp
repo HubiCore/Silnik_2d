@@ -35,7 +35,6 @@ public:
     sf::Color getColor() const { return color; }
 
     void draw(PrimitiveRenderer& renderer) const {
-        // Używamy bezpośrednio współrzędnych punktów
         renderer.drawLine(getP1().getX(), getP1().getY(), getP2().getX(), getP2().getY(), color);
     }
 };
@@ -46,8 +45,6 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
     DrawablePoint2D p2(200, 200, sf::Color::White);
     DrawableLineSegment line(p1, p2, sf::Color::Red);
 
-
-
     std::vector<sf::Vector2f> polylinePoints = {
         {300, 100}, {400, 150}, {450, 250}, {350, 300}, {100, 300}
     };
@@ -57,7 +54,6 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
     renderer.drawPoint(150, 150, sf::Color::White);
     line.draw(renderer);
 
-    // Pozostałe elementy z oryginalnej funkcji
     renderer.drawLine(250, 100, 400, 200, sf::Color::Green);
     renderer.drawLineIncremental(400, 100, 550, 200, sf::Color::Cyan);
 
@@ -109,8 +105,10 @@ int main()
 
     engine.log("Custom main loop started.");
 
+    // =========================
     // Tworzenie gracza
-
+    Player player(400, 300, 20, sf::Color::Cyan); // przykładowa pozycja, rozmiar i kolor
+    // =========================
 
     // Zegar do pomiaru czasu między klatkami
     sf::Clock clock;
@@ -118,7 +116,6 @@ int main()
 
     while (window->isOpen())
     {
-        // Oblicz czas od ostatniej klatki
         float deltaTime = clock.restart().asSeconds();
 
         sf::Event event;
@@ -136,49 +133,60 @@ int main()
 
                 buffer.clear(sf::Color(50, 50, 50));
                 PrimitiveRenderer bufferRenderer(&buffer);
-                drawAllFigures(bufferRenderer); // Fixed: removed player parameter
+                drawAllFigures(bufferRenderer);
 
                 if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    engine.log("Running FLOOD FILL...");
                     bufferRenderer.floodFill0(mx, my, sf::Color::Blue, sf::Color(50, 50, 50));
-                }
                 else if (event.mouseButton.button == sf::Mouse::Right)
-                {
-                    engine.log("Running BOUNDARY FILL...");
                     bufferRenderer.boundaryFillIterative0(mx, my, sf::Color::Yellow, sf::Color::Red);
-                }
+
+                // Rysowanie gracza
+                player.draw(bufferRenderer);
 
                 buffer.display();
             }
 
             if (event.type == sf::Event::KeyPressed)
             {
-                engine.log("Key pressed: " + std::to_string(event.key.code));
                 if (event.key.code == sf::Keyboard::Escape)
                     window->close();
                 else if (event.key.code == sf::Keyboard::R)
                 {
                     buffer.clear(sf::Color(50, 50, 50));
                     PrimitiveRenderer bufferRenderer(&buffer);
-                    drawAllFigures(bufferRenderer); // Fixed: removed player parameter
+                    drawAllFigures(bufferRenderer);
+                    player.draw(bufferRenderer);
                     buffer.display();
                 }
             }
         }
 
-        // WAŻNE: Aktualizuj gracza w każdej klatce!
-
+        // Sterowanie gracza
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            player.move(-200 * deltaTime, 0);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            player.move(200 * deltaTime, 0);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            player.move(0, -200 * deltaTime);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            player.move(0, 200 * deltaTime);
 
         if (firstFrame) {
             buffer.clear(sf::Color(50, 50, 50));
             PrimitiveRenderer bufferRenderer(&buffer);
-            drawAllFigures(bufferRenderer); // Fixed: removed player parameter
+            drawAllFigures(bufferRenderer);
+            player.draw(bufferRenderer);
             buffer.display();
             firstFrame = false;
         }
 
-        // Rysuj aktualną scenę w każdej klatce
+        // Aktualizacja sceny
+        buffer.clear(sf::Color(50, 50, 50));
+        PrimitiveRenderer bufferRenderer(&buffer);
+        drawAllFigures(bufferRenderer);
+        player.draw(bufferRenderer);
+        buffer.display();
+
         window->clear();
         sf::Sprite sprite(buffer.getTexture());
         window->draw(sprite);
