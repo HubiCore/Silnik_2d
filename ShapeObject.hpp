@@ -10,8 +10,7 @@ class ShapeObject :
 public:
     virtual ~ShapeObject() = default;
 
-    // draw(), translate(), rotate(), scale()
-    // pozostają abstrakcyjne
+
 };
 
 #endif

@@ -23,12 +23,12 @@ public:
 
     void draw(PrimitiveRenderer& renderer) override;
 
-    // TransformableObject
+
     void translate(float dx, float dy) override;
     void rotate(float angleDeg) override;
     void scale(float factor) override;
 
-    // Own
+
     bool loadFromFile(const std::string& path);
 };
 

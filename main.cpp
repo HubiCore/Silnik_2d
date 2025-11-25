@@ -39,8 +39,7 @@ public:
     }
 };
 
-void drawAllFigures(PrimitiveRenderer& renderer) {
-    // Tworzenie figur z użyciem rozszerzonych klas
+void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
     DrawablePoint2D p1(100, 100, sf::Color::Yellow);
     DrawablePoint2D p2(200, 200, sf::Color::White);
     DrawableLineSegment line(p1, p2, sf::Color::Red);
@@ -54,6 +53,7 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
     renderer.drawPoint(150, 150, sf::Color::White);
     line.draw(renderer);
 
+    //  elementy z oryginalnej funkcji
     renderer.drawLine(250, 100, 400, 200, sf::Color::Green);
     renderer.drawLineIncremental(400, 100, 550, 200, sf::Color::Cyan);
 
@@ -76,13 +76,16 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
     renderer.drawPolygon(5, 100, {1000, 300}, 0, sf::Color::Red);
 
     renderer.floodFill0(200, 400, sf::Color(0, 255, 255, 150), sf::Color::Green);
+
+    // Rysowanie gracza
+    player.draw(renderer);
 }
 
 int main()
 {
     Engine engine;
 
-    if (!engine.init("Simple engine", 800, 600, true, 144))
+    if (!engine.init("Simple engine", 800, 600, true, 30))
         return -1;
 
     engine.setClearColor(sf::Color(50, 50, 50));
@@ -103,12 +106,20 @@ int main()
         return -1;
     }
 
-    engine.log("Custom main loop started.");
+    // INICJALIZACJA GRACZA
+    // Tworzenie tekstury dla gracza (placeholder)
+    sf::Texture playerTexture;
+    sf::Image playerImage;
+    playerImage.create(32, 32, sf::Color::Green); // Zielony kwadrat jako placeholder
+    if (!playerTexture.loadFromImage(playerImage)) {
+        engine.log("ERROR: Unable to create player texture!");
+        return -1;
+    }
 
-    // =========================
-    // Tworzenie gracza
-    Player player(400, 300, 20, sf::Color::Cyan); // przykładowa pozycja, rozmiar i kolor
-    // =========================
+    // Tworzenie obiektu gracza
+    Player player(playerTexture, 400.f, 300.f, 3.0f); // Pozycja startowa i prędkość
+
+    engine.log("Custom main loop started.");
 
     // Zegar do pomiaru czasu między klatkami
     sf::Clock clock;
@@ -116,7 +127,11 @@ int main()
 
     while (window->isOpen())
     {
+        // Oblicz czas od ostatniej klatki
         float deltaTime = clock.restart().asSeconds();
+
+        // UPDATE GRACZA
+        player.update();
 
         sf::Event event;
         while (window->pollEvent(event))
@@ -133,63 +148,53 @@ int main()
 
                 buffer.clear(sf::Color(50, 50, 50));
                 PrimitiveRenderer bufferRenderer(&buffer);
-                drawAllFigures(bufferRenderer);
+                drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
 
                 if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    engine.log("Running FLOOD FILL...");
                     bufferRenderer.floodFill0(mx, my, sf::Color::Blue, sf::Color(50, 50, 50));
+                }
                 else if (event.mouseButton.button == sf::Mouse::Right)
+                {
+                    engine.log("Running BOUNDARY FILL...");
                     bufferRenderer.boundaryFillIterative0(mx, my, sf::Color::Yellow, sf::Color::Red);
-
-                // Rysowanie gracza
-                player.draw(bufferRenderer);
+                }
 
                 buffer.display();
             }
 
             if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::Escape)
+                engine.log("Key pressed: " + std::to_string(event.key.code));
+                if (event.key.code == sf::Keyboard::Escape) //<-wyłączanie
                     window->close();
                 else if (event.key.code == sf::Keyboard::R)
                 {
                     buffer.clear(sf::Color(50, 50, 50));
                     PrimitiveRenderer bufferRenderer(&buffer);
-                    drawAllFigures(bufferRenderer);
-                    player.draw(bufferRenderer);
+                    drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
                     buffer.display();
                 }
             }
         }
-
-        // Sterowanie gracza
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            player.move(-200 * deltaTime, 0);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            player.move(200 * deltaTime, 0);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            player.move(0, -200 * deltaTime);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            player.move(0, 200 * deltaTime);
-
+        update_frame(buffer, player);
         if (firstFrame) {
             buffer.clear(sf::Color(50, 50, 50));
             PrimitiveRenderer bufferRenderer(&buffer);
-            drawAllFigures(bufferRenderer);
-            player.draw(bufferRenderer);
+            drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
             buffer.display();
             firstFrame = false;
         }
 
-        // Aktualizacja sceny
-        buffer.clear(sf::Color(50, 50, 50));
-        PrimitiveRenderer bufferRenderer(&buffer);
-        drawAllFigures(bufferRenderer);
-        player.draw(bufferRenderer);
-        buffer.display();
-
+        // Rysuj aktualną scenę w każdej klatce
         window->clear();
         sf::Sprite sprite(buffer.getTexture());
         window->draw(sprite);
+
+        // Dodatkowe rysowanie gracza bezpośrednio na oknie (jeśli potrzebne)
+        // player.draw(renderer);
+
         window->display();
     }
 
