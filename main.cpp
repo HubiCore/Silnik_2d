@@ -48,7 +48,7 @@ void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
         {300, 100}, {400, 150}, {450, 250}, {350, 300}, {100, 300}
     };
 
-    // Rysowanie punktów i linii
+    //  punktów i linii
     p1.draw(renderer);
     renderer.drawPoint(150, 150, sf::Color::White);
     line.draw(renderer);
