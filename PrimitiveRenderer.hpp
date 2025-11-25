@@ -10,7 +10,9 @@ private:
 
 public:
     PrimitiveRenderer(sf::RenderTarget* target = nullptr);
+
     void setTarget(sf::RenderTarget* target);
+    sf::RenderTarget* getTarget() { return target; }
 
     void drawPoint(float x, float y, sf::Color color);
     void drawLine(float x1, float y1, float x2, float y2, sf::Color color);

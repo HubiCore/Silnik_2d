@@ -23,6 +23,15 @@ add_executable(PGK main.cpp
         DrawableObject.hpp
         TransformableObject.hpp
         ShapeObject.hpp
-        Player.hpp)
+        Player.hpp
+        BitmapHandler.hpp
+        AnimatedObject.hpp
+        BitmapObject.hpp
+        BitmapHandler.cpp
+        BitmapObject.cpp
+        SpriteObject.hpp
+        SpriteObject.cpp
+        Player.cpp
+)
 
 target_link_libraries(PGK PRIVATE sfml-system sfml-window sfml-graphics sfml-audio)

@@ -46,9 +46,7 @@ void drawAllFigures(PrimitiveRenderer& renderer) {
     DrawablePoint2D p2(200, 200, sf::Color::White);
     DrawableLineSegment line(p1, p2, sf::Color::Red);
 
-    static Player player(400, 300, sf::Color::Cyan, 3.0f);
-    player.update(0.016f); // Dla 60 FPS
-    player.draw(renderer);
+
 
     std::vector<sf::Vector2f> polylinePoints = {
         {300, 100}, {400, 150}, {450, 250}, {350, 300}, {100, 300}
@@ -112,7 +110,7 @@ int main()
     engine.log("Custom main loop started.");
 
     // Tworzenie gracza
-    Player player(400, 300, sf::Color::Cyan, 3.0f);
+
 
     // Zegar do pomiaru czasu między klatkami
     sf::Clock clock;
@@ -170,7 +168,7 @@ int main()
         }
 
         // WAŻNE: Aktualizuj gracza w każdej klatce!
-        player.update(deltaTime);
+
 
         if (firstFrame) {
             buffer.clear(sf::Color(50, 50, 50));
