@@ -5,6 +5,8 @@
 #include "Player.hpp"
 #include <vector>
 #include <cmath>
+#include <iostream>
+#include <map>
 
 // Rozszerzone klasy z obsługą kolorów i PrimitiveRenderer
 class DrawablePoint2D : public Point2D {
@@ -48,12 +50,12 @@ void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
         {300, 100}, {400, 150}, {450, 250}, {350, 300}, {100, 300}
     };
 
-    //  punktów i linii
+    // punktów i linii
     p1.draw(renderer);
     renderer.drawPoint(150, 150, sf::Color::White);
     line.draw(renderer);
 
-    //  elementy z oryginalnej funkcji
+    // elementy z oryginalnej funkcji
     renderer.drawLine(250, 100, 400, 200, sf::Color::Green);
     renderer.drawLineIncremental(400, 100, 550, 200, sf::Color::Cyan);
 
@@ -80,20 +82,61 @@ void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
     // Rysowanie gracza
     player.draw(renderer);
 }
-void update_frame(sf::RenderTexture buffer, Player player) {
-    buffer.clear(sf::Color(50, 50, 50));
-    PrimitiveRenderer bufferRenderer(&buffer);
-    drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
-    buffer.display();
+
+// Funkcja do tworzenia placeholder sprite'ów programowo dla różnych kierunków
+sf::Texture createDirectionTexture(sf::Color baseColor, Player::Direction direction) {
+    sf::Image img;
+    img.create(32, 32, sf::Color::Transparent);
+
+    // Rysujemy podstawowy kształt (kwadrat)
+    for (int y = 8; y < 24; y++) {
+        for (int x = 8; x < 24; x++) {
+            img.setPixel(x, y, baseColor);
+        }
+    }
+
+    // Dodajemy "głowę" w zależności od kierunku
+    switch (direction) {
+        case Player::Direction::UP:
+            for (int x = 12; x < 20; x++) {
+                for (int y = 4; y < 8; y++) {
+                    img.setPixel(x, y, baseColor);
+                }
+            }
+            break;
+        case Player::Direction::DOWN:
+            for (int x = 12; x < 20; x++) {
+                for (int y = 24; y < 28; y++) {
+                    img.setPixel(x, y, baseColor);
+                }
+            }
+            break;
+        case Player::Direction::LEFT:
+            for (int x = 4; x < 8; x++) {
+                for (int y = 12; y < 20; y++) {
+                    img.setPixel(x, y, baseColor);
+                }
+            }
+            break;
+        case Player::Direction::RIGHT:
+            for (int x = 24; x < 28; x++) {
+                for (int y = 12; y < 20; y++) {
+                    img.setPixel(x, y, baseColor);
+                }
+            }
+            break;
+    }
+
+    sf::Texture texture;
+    texture.loadFromImage(img);
+    return texture;
 }
-
-
 
 int main()
 {
     Engine engine;
 
-    if (!engine.init("Simple engine", 800, 600, true, 30))
+    if (!engine.init("Simple engine", 800, 600, true, 144))
         return -1;
 
     engine.setClearColor(sf::Color(50, 50, 50));
@@ -114,18 +157,34 @@ int main()
         return -1;
     }
 
-    // INICJALIZACJA GRACZA
-    // Tworzenie tekstury dla gracza (placeholder)
-    sf::Texture playerTexture;
-    sf::Image playerImage;
-    playerImage.create(32, 32, sf::Color::Green); // Zielony kwadrat jako placeholder
-    if (!playerTexture.loadFromImage(playerImage)) {
-        engine.log("ERROR: Unable to create player texture!");
-        return -1;
+    // ŁADOWANIE SPRITE'ÓW DLA RÓŻNYCH KIERUNKÓW
+    std::map<Player::Direction, sf::Texture> playerTextures;
+
+    // Próba załadowania sprite'ów z plików
+    bool loadedCustomSprites = true;
+
+    // Możesz zmienić ścieżki na swoje pliki
+    if (!playerTextures[Player::Direction::UP].loadFromFile("C:/Users/huber/Downloads/player_up.png") ||
+        !playerTextures[Player::Direction::DOWN].loadFromFile("C:/Users/huber/Downloads/player_down.png") ||
+        !playerTextures[Player::Direction::LEFT].loadFromFile("C:/Users/huber/Downloads/player_left.png") ||
+        !playerTextures[Player::Direction::RIGHT].loadFromFile("C:/Users/huber/Downloads/player_right.png")) {
+
+        engine.log("WARNING: Could not load direction sprites! Creating placeholders.");
+        loadedCustomSprites = false;
+
+        // Tworzenie placeholder sprite'ów programowo z różnymi kolorami
+        playerTextures[Player::Direction::UP] = createDirectionTexture(sf::Color::Red, Player::Direction::UP);
+        playerTextures[Player::Direction::DOWN] = createDirectionTexture(sf::Color::Green, Player::Direction::DOWN);
+        playerTextures[Player::Direction::LEFT] = createDirectionTexture(sf::Color::Blue, Player::Direction::LEFT);
+        playerTextures[Player::Direction::RIGHT] = createDirectionTexture(sf::Color::Yellow, Player::Direction::RIGHT);
+
+        engine.log("Created placeholder sprites with colors: UP=Red, DOWN=Green, LEFT=Blue, RIGHT=Yellow");
+    } else {
+        engine.log("Successfully loaded all direction sprites!");
     }
 
-    // Tworzenie obiektu gracza
-    Player player(playerTexture, 400.f, 300.f, 3.0f); // Pozycja startowa i prędkość
+    // Tworzenie obiektu gracza z teksturami kierunków
+    Player player(playerTextures, 400.f, 300.f, 3.0f);
 
     engine.log("Custom main loop started.");
 
@@ -138,7 +197,7 @@ int main()
         // Oblicz czas od ostatniej klatki
         float deltaTime = clock.restart().asSeconds();
 
-        // UPDATE GRACZA
+        // UPDATE GRACZA (teraz z automatyczną zmianą sprite'a w zależności od kierunku)
         player.update();
 
         sf::Event event;
@@ -156,7 +215,7 @@ int main()
 
                 buffer.clear(sf::Color(50, 50, 50));
                 PrimitiveRenderer bufferRenderer(&buffer);
-                drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
+                drawAllFigures(bufferRenderer, player);
 
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
@@ -175,41 +234,24 @@ int main()
             if (event.type == sf::Event::KeyPressed)
             {
                 engine.log("Key pressed: " + std::to_string(event.key.code));
-                if (event.key.code == sf::Keyboard::Escape) //<-wyłączanie
+                if (event.key.code == sf::Keyboard::Escape)
                     window->close();
-                /*
-                else if (event.key.code == sf::Keyboard::R)
-                { //w tym elfe aktualizowanie
-                    buffer.clear(sf::Color(50, 50, 50));
-                    PrimitiveRenderer bufferRenderer(&buffer);
-                    drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
-                    buffer.display();
-                }
-                */
             }
         }
 
         buffer.clear(sf::Color(50, 50, 50));
         PrimitiveRenderer bufferRenderer(&buffer);
-        drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
+        drawAllFigures(bufferRenderer, player);
         buffer.display();
 
         if (firstFrame) {
-            buffer.clear(sf::Color(50, 50, 50));
-            PrimitiveRenderer bufferRenderer(&buffer);
-            drawAllFigures(bufferRenderer, player); // Przekazujemy gracza do rysowania
-            buffer.display();
             firstFrame = false;
         }
 
-        // Rysuj aktualną scenę w każdej klatce
+        // Rysuj aktualną scenę
         window->clear();
         sf::Sprite sprite(buffer.getTexture());
         window->draw(sprite);
-
-        // Dodatkowe rysowanie gracza bezpośrednio na oknie (jeśli potrzebne)
-        // player.draw(renderer);
-
         window->display();
     }
 

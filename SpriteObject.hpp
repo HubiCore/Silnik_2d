@@ -1,35 +1,27 @@
 #ifndef SPRITEOBJECT_HPP
 #define SPRITEOBJECT_HPP
 
-#include "DrawableObject.hpp"
-#include "TransformableObject.hpp"
 #include <SFML/Graphics.hpp>
+#include "PrimitiveRenderer.hpp"
 
-class SpriteObject : public DrawableObject, public TransformableObject {
+class SpriteObject {
+public:
+    SpriteObject(const sf::Texture& tex);
+    virtual ~SpriteObject() = default;
+
+    void setTexture(const sf::Texture& tex);
+    void draw(PrimitiveRenderer& renderer);
+    void translate(float dx, float dy);
+    void rotate(float angleDeg);
+    void scale(float factor);
+
+    const sf::Sprite& getSprite() const { return sprite; }
+    virtual std::string getType() const { return "SpriteObject"; }
+    virtual void update() {}
+
 protected:
     sf::Texture texture;
     sf::Sprite sprite;
-
-public:
-    SpriteObject() = default;
-    explicit SpriteObject(const sf::Texture& tex);
-
-    std::string getType() const override { return "SpriteObject"; }
-
-    void update() override {}
-    void draw() override {}
-
-    void draw(PrimitiveRenderer& renderer) override;
-
-    // Transformable
-    void translate(float dx, float dy) override;
-    void rotate(float angleDeg) override;
-    void scale(float factor) override;
-
-    // Helpers
-    void setTexture(const sf::Texture& tex);
-    const sf::Sprite& getSprite() const { return sprite; }
-    sf::Sprite& getSprite() { return sprite; }
 };
 
 #endif
