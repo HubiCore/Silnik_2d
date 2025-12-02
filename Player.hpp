@@ -4,9 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include <map>
 #include "SpriteObject.hpp"
+#include "AnimatedObject.hpp"
 
-class Player : public SpriteObject {
+class Player : public SpriteObject, public AnimatedObject {
 public:
+
     enum class Direction { UP, DOWN, LEFT, RIGHT };
 
     Player(float x, float y, float speed);

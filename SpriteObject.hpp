@@ -21,6 +21,9 @@ public:
     virtual std::string getType() const { return "SpriteObject"; }
     virtual void update() {}
 
+    void setTextureRect(const sf::IntRect& rect) { sprite.setTextureRect(rect); }
+
+
 protected:
     const sf::Texture* texture = nullptr;
     sf::Sprite sprite;
