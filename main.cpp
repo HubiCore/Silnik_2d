@@ -32,32 +32,92 @@ public:
     }
 };
 void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
+
+    // ──────────────────── POINTS ─────────────────────
     DrawablePoint2D p1(100, 100, sf::Color::Yellow);
     DrawablePoint2D p2(200, 200, sf::Color::White);
-    DrawableLineSegment line(p1, p2, sf::Color::Red);
-    std::vector<sf::Vector2f> polylinePoints = {
-        {300, 100}, {400, 150}, {450, 250}, {350, 300}, {100, 300}
-    };
+
     p1.draw(renderer);
     renderer.drawPoint(150, 150, sf::Color::White);
+
+    // Punkty jako małe kwadraciki (10×10)
+    player.addCollisionObject(sf::FloatRect(100 - 5, 100 - 5, 10, 10));
+    player.addCollisionObject(sf::FloatRect(150 - 5, 150 - 5, 10, 10));
+
+    // ──────────────────── LINE SEGMENT ─────────────────────
+    DrawableLineSegment line(p1, p2, sf::Color::Red);
     line.draw(renderer);
+
+    // Hitbox linii (prostokąt obejmujący)
+    player.addCollisionObject(sf::FloatRect(100, 100, 100, 100));
+
+
+    // ──────────────────── POLYLINES ─────────────────────
+    std::vector<sf::Vector2f> polylinePoints = {
+        {300,100}, {400,150}, {450,250}, {350,300}, {100,300}
+    };
+
     renderer.drawLine(250, 100, 400, 200, sf::Color::Green);
     renderer.drawLineIncremental(400, 100, 550, 200, sf::Color::Cyan);
     renderer.drawPolyLine(polylinePoints, true, sf::Color::Cyan);
-    std::vector<sf::Vector2f> openLine = {{600, 100}, {650, 130}, {700, 200}};
+
+    // Polyline hitbox → obwiednia
+    player.addCollisionObject(sf::FloatRect(100, 100, 350, 200));
+
+    // Open polyline
+    std::vector<sf::Vector2f> openLine = {{600,100}, {650,130}, {700,200}};
     renderer.drawPolyLine(openLine, false, sf::Color::White);
+
+    player.addCollisionObject(sf::FloatRect(600, 100, 100, 100));
+
+
+    // ──────────────────── CIRCLES ─────────────────────
     renderer.drawCircle(600, 200, 40, sf::Color::Green, sf::Color::White);
+    player.addCollisionObject(sf::FloatRect(600 - 40, 200 - 40, 80, 80));
+
     renderer.drawCircleSymmetric(700, 350, 60, sf::Color::Red);
+    player.addCollisionObject(sf::FloatRect(700 - 60, 350 - 60, 120, 120));
+
+
+    // ──────────────────── ELLIPSES ─────────────────────
     renderer.drawElipse(600, 500, 100, 60, sf::Color::Magenta);
+    //player.addCollisionObject(sf::FloatRect(600 - 100, 500 - 60, 200, 120));
+
     renderer.drawEllipseSymmetric(900, 400, 80, 40, sf::Color::Yellow);
+    player.addCollisionObject(sf::FloatRect(900 - 80, 400 - 40, 160, 80));
+
+
+    // ──────────────────── POLYGONS ─────────────────────
+
+    // Triangle R = 60 at (200, 400)
     renderer.drawPolygon(3, 60, {200, 400}, 0, sf::Color::Red);
-    renderer.drawPolygon(4, 80, {350, 400}, M_PI / 4, sf::Color::Green);
+    player.addCollisionObject(sf::FloatRect(200 - 60, 400 - 60, 120, 120));
+
+    // Square R = 80 at (350, 400)
+    renderer.drawPolygon(4, 80, {350, 400}, M_PI/4, sf::Color::Green);
+    //player.addCollisionObject(sf::FloatRect(350 - 80, 400 - 80, 160, 160));
+
+    // Hexagon R = 50 at (500, 400)
     renderer.drawPolygon(6, 50, {500, 400}, 0, sf::Color::Red);
+    //player.addCollisionObject(sf::FloatRect(500 - 50, 400 - 50, 100, 100));
+
+    // Pentagons
     renderer.drawPolygon(5, 80, {1300, 300}, 0, sf::Color::Red);
+    player.addCollisionObject(sf::FloatRect(1300 - 80, 300 - 80, 160, 160));
+
     renderer.drawPolygon(5, 100, {1000, 300}, 0, sf::Color::Red);
-    renderer.floodFill0(200, 400, sf::Color(0, 255, 255, 150), sf::Color::Green);
+    player.addCollisionObject(sf::FloatRect(1000 - 100, 300 - 100, 200, 200));
+
+
+    // Flood fill – nie ma hitboxa, bo to wypełnienie
+    renderer.floodFill0(200, 400, sf::Color(0,255,255,150), sf::Color::Green);
+
+
+    // Draw player
     player.draw(renderer);
 }
+
+
 
 int main()
 {

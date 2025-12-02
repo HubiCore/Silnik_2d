@@ -32,6 +32,7 @@ add_executable(PGK main.cpp
         SpriteObject.hpp
         SpriteObject.cpp
         Player.cpp
+        AnimatedObject.cpp
 )
 
 target_link_libraries(PGK PRIVATE sfml-system sfml-window sfml-graphics sfml-audio)

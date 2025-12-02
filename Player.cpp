@@ -137,16 +137,27 @@ void Player::update()
 
 
     sf::Vector2f oldPosition = getPosition();
-    sf::Vector2f movement(0, 0);
+    sf::Vector2f movement(0.f, 0.f);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        translate(0, -speed); newDir = Direction::UP; moved = true;
+        movement.y -= speed;
+        newDir = Direction::UP; moved = true;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { translate(0,  speed); newDir = Direction::DOWN; moved = true; }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) { translate(-speed, 0); newDir = Direction::LEFT; moved = true; }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) { translate( speed, 0); newDir = Direction::RIGHT; moved = true; }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        movement.y += speed;
+        newDir = Direction::DOWN; moved = true;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        movement.x -= speed;
+        newDir = Direction::LEFT; moved = true;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        movement.x += speed;
+        newDir = Direction::RIGHT; moved = true;
+    }
 
     sf::Vector2f newPosition = calculateNewPosition(movement);
+
 
     if (moved && isPositionValid(newPosition)) {
         // Ustaw nową pozycję
@@ -288,27 +299,25 @@ void Player::clampToBounds() {
         return sf::Vector2f(currentPos.x + movement.x, currentPos.y + movement.y);
     }
 
-    bool Player::isPositionValid(const sf::Vector2f& position) const {
-        // Utwórz tymczasowy prostokąt dla gracza w nowej pozycji
-        sf::FloatRect tempBounds = getGlobalBounds();
-        tempBounds.left = position.x;
-        tempBounds.top = position.y;
+bool Player::isPositionValid(const sf::Vector2f& position) const {
+    sf::FloatRect tempBounds = getGlobalBounds();
+    tempBounds.left = position.x;
+    tempBounds.top = position.y;
 
-        // Sprawdź kolizję z granicami
-        bool boundsOk = boundaries.contains(tempBounds.left, tempBounds.top) &&
-                        boundaries.contains(tempBounds.left + tempBounds.width,
-                                            tempBounds.top + tempBounds.height);
+    bool boundsOk =
+        boundaries.contains(tempBounds.left, tempBounds.top) &&
+        boundaries.contains(tempBounds.left + tempBounds.width,
+                            tempBounds.top + tempBounds.height);
 
-        if (!boundsOk) {
+    if (!boundsOk)
+        return false;
+
+    for (const auto& obj : collisionObjects) {
+        if (tempBounds.intersects(obj))
             return false;
-        }
-
-        // Sprawdź kolizję z obiektami
-        for (const auto& obj : collisionObjects) {
-            if (tempBounds.intersects(obj)) {
-                return false;
-            }
-
-        }
     }
+
+    return true; // <── DODAJ TO
+}
+
 
