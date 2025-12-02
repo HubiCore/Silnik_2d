@@ -6,11 +6,13 @@
 
 class SpriteObject {
 public:
+    SpriteObject() = default;
     SpriteObject(const sf::Texture& tex);
     virtual ~SpriteObject() = default;
 
     void setTexture(const sf::Texture& tex);
     void draw(PrimitiveRenderer& renderer);
+
     void translate(float dx, float dy);
     void rotate(float angleDeg);
     void scale(float factor);
@@ -20,7 +22,7 @@ public:
     virtual void update() {}
 
 protected:
-    sf::Texture texture;
+    const sf::Texture* texture = nullptr;
     sf::Sprite sprite;
 };
 

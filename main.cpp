@@ -163,28 +163,19 @@ int main()
     // Próba załadowania sprite'ów z plików
     bool loadedCustomSprites = true;
 
-    // Możesz zmienić ścieżki na swoje pliki
-    if (!playerTextures[Player::Direction::UP].loadFromFile("C:/Users/huber/Downloads/player_up.png") ||
-        !playerTextures[Player::Direction::DOWN].loadFromFile("C:/Users/huber/Downloads/player_down.png") ||
-        !playerTextures[Player::Direction::LEFT].loadFromFile("C:/Users/huber/Downloads/player_left.png") ||
-        !playerTextures[Player::Direction::RIGHT].loadFromFile("C:/Users/huber/Downloads/player_right.png")) {
+    // Tworzenie obiektu gracza z teksturami kierunków
+    Player player(400.f, 300.f, 3.0f);
 
-        engine.log("WARNING: Could not load direction sprites! Creating placeholders.");
-        loadedCustomSprites = false;
-
-        // Tworzenie placeholder sprite'ów programowo z różnymi kolorami
-        playerTextures[Player::Direction::UP] = createDirectionTexture(sf::Color::Red, Player::Direction::UP);
-        playerTextures[Player::Direction::DOWN] = createDirectionTexture(sf::Color::Green, Player::Direction::DOWN);
-        playerTextures[Player::Direction::LEFT] = createDirectionTexture(sf::Color::Blue, Player::Direction::LEFT);
-        playerTextures[Player::Direction::RIGHT] = createDirectionTexture(sf::Color::Yellow, Player::Direction::RIGHT);
-
-        engine.log("Created placeholder sprites with colors: UP=Red, DOWN=Green, LEFT=Blue, RIGHT=Yellow");
-    } else {
-        engine.log("Successfully loaded all direction sprites!");
+    // próbujemy załadować sprite'y z folderu
+    if (!player.loadSprites("C:/Users/huber/Desktop/Studia/Sprite"))
+    {
+        engine.log("Using placeholder sprites.");
+    }
+    else
+    {
+        engine.log("Player sprites loaded!");
     }
 
-    // Tworzenie obiektu gracza z teksturami kierunków
-    Player player(playerTextures, 400.f, 300.f, 3.0f);
 
     engine.log("Custom main loop started.");
 

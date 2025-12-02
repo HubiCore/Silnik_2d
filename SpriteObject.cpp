@@ -5,8 +5,8 @@ SpriteObject::SpriteObject(const sf::Texture& tex) {
 }
 
 void SpriteObject::setTexture(const sf::Texture& tex) {
-    texture = tex;
-    sprite.setTexture(texture);
+    texture = &tex;
+    sprite.setTexture(*texture);
 }
 
 void SpriteObject::draw(PrimitiveRenderer& renderer) {
