@@ -16,10 +16,10 @@ bool Player::loadSprites(const std::string& folder)
 {
     bool ok = true;
 
-    ok &= directionTextures[Direction::UP].loadFromFile(folder + "/up.png");
-    ok &= directionTextures[Direction::DOWN].loadFromFile(folder + "/down.png");
-    ok &= directionTextures[Direction::LEFT].loadFromFile(folder + "/left.png");
-    ok &= directionTextures[Direction::RIGHT].loadFromFile(folder + "/right.png");
+    ok &= directionTextures[Direction::UP].loadFromFile(folder + "/HubertB.png");
+    ok &= directionTextures[Direction::DOWN].loadFromFile(folder + "/HubertF.png");
+    ok &= directionTextures[Direction::LEFT].loadFromFile(folder + "/HubertL.png");
+    ok &= directionTextures[Direction::RIGHT].loadFromFile(folder + "/HubertR.png");
 
     if (!ok)
         std::cout << "Failed to load sprites. Using placeholders.\n";
@@ -61,7 +61,7 @@ void Player::createPlaceholderSprites()
 {
     auto makeTex = [](sf::Color c, Direction d) {
         sf::Image img;
-        img.create(32, 32, sf::Color::Transparent);
+        img.create(64, 64, sf::Color::Transparent);
 
         for (int y = 8; y < 24; y++)
             for (int x = 8; x < 24; x++)
