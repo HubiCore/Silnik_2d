@@ -2,7 +2,7 @@
 #define SPRITEOBJECT_HPP
 
 #include <SFML/Graphics.hpp>
-#include "PrimitiveRenderer.hpp"
+#include "../Renderer/PrimitiveRenderer.hpp"
 
 class SpriteObject {
 public:

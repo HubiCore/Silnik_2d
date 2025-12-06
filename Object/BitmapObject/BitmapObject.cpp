@@ -1,4 +1,4 @@
-#include "BitmapObject.hpp"
+#include "../BitmapObject/BitmapObject.hpp"
 
 BitmapObject::BitmapObject(const std::string& path) {
     loadFromFile(path);

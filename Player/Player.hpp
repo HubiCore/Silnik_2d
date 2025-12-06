@@ -5,8 +5,8 @@
 #include <map>
 #include <vector>
 #include <variant>
-#include "SpriteObject.hpp"
-#include "AnimatedObject.hpp"
+#include "../Object/sprite/SpriteObject.hpp"
+#include "../Object/AnimatedObject/AnimatedObject.hpp"
 
 class Player : public SpriteObject, public AnimatedObject {
 public:

@@ -1,9 +1,9 @@
-#include "Engine.hpp"
-#include "PrimitiveRenderer.hpp"
-#include "Point2D.hpp"
-#include "LineSegment.hpp"
-#include "Player.hpp"
-#include "drawAllFigures.hpp"  // Dodaj nagłówek z deklaracją funkcji
+#include "Engine/Engine.hpp"
+#include "Object/Renderer/PrimitiveRenderer.hpp"
+#include "Figures/Point2D/Point2D.hpp"
+#include "Figures/LineSegment/LineSegment.hpp"
+#include "Player/Player.hpp"
+#include "Figures/drawAllFigures/drawAllFigures.hpp"
 #include <vector>
 #include <cmath>
 #include <iostream>
@@ -48,7 +48,7 @@ int main() {
     player.setBoundaries(gameBounds);
 
     // Load player sprites
-    if (!player.loadSprites("D:/studia/Silnik2D/sprite")) {
+    if (!player.loadSprites("../Object/sprite")) {
         engine.log("Using placeholder sprites.");
     } else {
         engine.log("Player sprites loaded!");

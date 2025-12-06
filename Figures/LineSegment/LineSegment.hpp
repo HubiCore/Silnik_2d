@@ -1,9 +1,9 @@
 #ifndef LINESEGMENT_HPP
 #define LINESEGMENT_HPP
 
-#include "ShapeObject.hpp"
-#include "Point2D.hpp"
-#include "PrimitiveRenderer.hpp"
+#include "../../Object/ShapeObject.hpp"
+#include "../Point2D/Point2D.hpp"
+#include "../../Object/Renderer/PrimitiveRenderer.hpp"
 #include <SFML/Graphics.hpp>
 
 class LineSegment : public ShapeObject {

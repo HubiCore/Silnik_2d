@@ -1,8 +1,8 @@
 #ifndef POINT2D_HPP
 #define POINT2D_HPP
 
-#include "ShapeObject.hpp"
-#include "PrimitiveRenderer.hpp"
+#include "../../Object/ShapeObject.hpp"
+#include "../../Object/Renderer/PrimitiveRenderer.hpp"
 #include <SFML/Graphics.hpp>
 
 class Point2D : public ShapeObject {

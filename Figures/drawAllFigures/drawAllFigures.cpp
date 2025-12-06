@@ -1,7 +1,7 @@
-#include "drawAllFigures.hpp"
-#include "Engine.hpp"
-#include "Point2D.hpp"
-#include "LineSegment.hpp"
+#include "../drawAllFigures/drawAllFigures.hpp"
+#include "../../Engine/Engine.hpp"
+#include "../Point2D/Point2D.hpp"
+#include "../LineSegment/LineSegment.hpp"
 #include <vector>
 #include <cmath>
 #include <iostream>
@@ -10,7 +10,7 @@
 const float PI = 3.14159265358979323846f;
 
 // ============================================================================
-// HELPER CLASSES FOR DRAWING (pozostają bez zmian)
+// HELPER CLASSES FOR DRAWING
 // ============================================================================
 
 class DrawablePoint2D : public Point2D {
@@ -44,7 +44,7 @@ public:
 };
 
 // ============================================================================
-// HELPER FUNCTIONS (pozostają bez zmian)
+// HELPER FUNCTIONS
 // ============================================================================
 
 std::vector<sf::Vector2f> calculatePolygonPoints(int sides, float radius,
@@ -109,7 +109,7 @@ std::vector<sf::Vector2f> createLineHitbox(float x1, float y1, float x2, float y
 }
 
 // ============================================================================
-// INDIVIDUAL SHAPE FUNCTIONS (nowe funkcje dla każdego kształtu)
+// INDIVIDUAL SHAPE FUNCTIONS
 // ============================================================================
 
 void drawPointWithHitbox(PrimitiveRenderer& renderer, Player& player,
@@ -222,49 +222,38 @@ void drawPolygonWithHitbox(PrimitiveRenderer& renderer, Player& player,
 }
 
 // ============================================================================
-// MAIN DRAWING FUNCTION (używa nowych funkcji)
+// PREDEFINED OBJECTS FUNCTIONS (funkcje dostępu do wcześniej zdefiniowanych obiektów)
 // ============================================================================
 
-void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
-    // Clear previous hitboxes
-    player.clearCollisionObjects();
-
-    // ------------------------------------------------------------------------
-    // POINTS
-    // ------------------------------------------------------------------------
+void drawPredefinedPoints(PrimitiveRenderer& renderer, Player& player) {
     drawPointWithHitbox(renderer, player, 100, 100, sf::Color::Yellow);
     drawPointWithHitbox(renderer, player, 150, 150, sf::Color::White);
     drawPointWithHitbox(renderer, player, 200, 200, sf::Color::White);
+}
 
-    // ------------------------------------------------------------------------
-    // LINES
-    // ------------------------------------------------------------------------
+void drawPredefinedLines(PrimitiveRenderer& renderer, Player& player) {
     drawLineWithHitbox(renderer, player, 100, 100, 200, 200, sf::Color::Red);
     drawLineWithHitbox(renderer, player, 250, 100, 400, 200, sf::Color::Green);
     drawLineWithHitbox(renderer, player, 400, 100, 550, 200, sf::Color::Cyan);
+}
 
-    // ------------------------------------------------------------------------
-    // POLYLINES
-    // ------------------------------------------------------------------------
+void drawPredefinedPolylines(PrimitiveRenderer& renderer, Player& player) {
     std::vector<sf::Vector2f> polylinePoints = {
         {300,100}, {400,150}, {450,250}, {350,300}, {100,300}
     };
     drawPolylineWithHitboxes(renderer, player, polylinePoints, true, sf::Color::Cyan, 2.0f);
+}
 
-    // ------------------------------------------------------------------------
-    // CIRCLES
-    // ------------------------------------------------------------------------
+void drawPredefinedCircles(PrimitiveRenderer& renderer, Player& player) {
     drawCircleWithHitbox(renderer, player, 600, 200, 40, sf::Color::Green, sf::Color::White);
     drawCircleSymmetricWithHitbox(renderer, player, 700, 350, 60, sf::Color::Red);
+}
 
-    // ------------------------------------------------------------------------
-    // ELLIPSES
-    // ------------------------------------------------------------------------
+void drawPredefinedEllipses(PrimitiveRenderer& renderer, Player& player) {
     drawEllipseWithHitbox(renderer, player, 500, 100, 80, 40, sf::Color::Yellow);
+}
 
-    // ------------------------------------------------------------------------
-    // REGULAR POLYGONS
-    // ------------------------------------------------------------------------
+void drawPredefinedPolygons(PrimitiveRenderer& renderer, Player& player) {
     // Trójkąt równoboczny (wierzchołek na górze)
     drawPolygonWithHitbox(renderer, player, 3, 40, sf::Vector2f(200, 400), -PI/2, sf::Color::Red);
 
@@ -277,6 +266,23 @@ void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
 
     // Pięciokąt (wierzchołek na górze)
     drawPolygonWithHitbox(renderer, player, 5, 70, sf::Vector2f(600, 300), -PI/2, sf::Color::Red);
+}
+
+// ============================================================================
+// MAIN DRAWING FUNCTION (teraz używa funkcji dostępu)
+// ============================================================================
+
+void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
+    // Clear previous hitboxes
+    player.clearCollisionObjects();
+
+    // Rysuj wszystkie predefiniowane obiekty
+    drawPredefinedPoints(renderer, player);
+    drawPredefinedLines(renderer, player);
+    drawPredefinedPolylines(renderer, player);
+    drawPredefinedCircles(renderer, player);
+    drawPredefinedEllipses(renderer, player);
+    drawPredefinedPolygons(renderer, player);
 
     // ------------------------------------------------------------------------
     // AREA FILLING - visual effect only, no hitboxes

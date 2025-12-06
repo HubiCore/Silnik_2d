@@ -1,7 +1,7 @@
 #ifndef UPDATABLEOBJECT_HPP
 #define UPDATABLEOBJECT_HPP
 
-#include "GameObjects.hpp"
+#include "GameObject/GameObjects.hpp"
 
 class UpdatableObject : public virtual GameObject {
 public:

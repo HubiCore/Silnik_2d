@@ -1,7 +1,7 @@
 #include "Engine.hpp"
-#include "PrimitiveRenderer.hpp"
-#include "Point2D.hpp"
-#include "LineSegment.hpp"
+#include "../Object/Renderer/PrimitiveRenderer.hpp"
+#include "../Figures/Point2D/Point2D.hpp"
+#include "../Figures/LineSegment/LineSegment.hpp"
 
 Engine::Engine() : fullscreen(false), mouseEnabled(false), keyboardEnabled(true), fps(60), isRunning(false),clearColor(sf::Color::Black) {
     logFile.open("engine_log.txt", std::ios::out);

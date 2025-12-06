@@ -1,4 +1,4 @@
-#include "BitmapHandler.hpp"
+#include "../BitmapHandler/BitmapHandler.hpp"
 
 bool BitmapHandler::loadImage(const std::string& filename, sf::Image& outImage) {
     return outImage.loadFromFile(filename);

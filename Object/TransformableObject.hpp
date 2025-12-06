@@ -1,7 +1,7 @@
 #ifndef TRANSFORMABLEOBJECT_HPP
 #define TRANSFORMABLEOBJECT_HPP
 
-#include "GameObjects.hpp"
+#include "GameObject/GameObjects.hpp"
 
 class TransformableObject : public virtual GameObject {
 public:

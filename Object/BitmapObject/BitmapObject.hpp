@@ -1,8 +1,8 @@
 #ifndef BITMAPOBJECT_HPP
 #define BITMAPOBJECT_HPP
 
-#include "DrawableObject.hpp"
-#include "TransformableObject.hpp"
+#include "../DrawableObject.hpp"
+#include "../TransformableObject.hpp"
 #include <SFML/Graphics.hpp>
 #include <string>
 
