@@ -1,6 +1,8 @@
 #include "Player.hpp"
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 
 Player::Player(float x, float y, float speed)
     : AnimatedObject(sprite), speed(speed), boundaries(0, 0, 800, 600) {
@@ -18,8 +20,6 @@ bool Player::loadSprites(const std::string& folder)
     ok &= directionTextures[Direction::DOWN].loadFromFile(folder + "/down.png");
     ok &= directionTextures[Direction::LEFT].loadFromFile(folder + "/left.png");
     ok &= directionTextures[Direction::RIGHT].loadFromFile(folder + "/right.png");
-
-
 
     if (!ok)
         std::cout << "Failed to load sprites. Using placeholders.\n";
@@ -57,12 +57,11 @@ bool Player::loadAnimatedSprites(const std::string& folder)
     return ok;
 }
 
-
 void Player::createPlaceholderSprites()
 {
     auto makeTex = [](sf::Color c, Direction d) {
         sf::Image img;
-        img.create(64, 64, sf::Color::Transparent);
+        img.create(32, 32, sf::Color::Transparent);
 
         for (int y = 8; y < 24; y++)
             for (int x = 8; x < 24; x++)
@@ -105,7 +104,6 @@ void Player::setDirection(Direction newDirection)
 
     setTexture(directionTextures[currentDirection]);
 
-    // ustaw nową animację
     frames = directionFrames[currentDirection];
     currentFrame = 0;
     frameTimer = 0.f;
@@ -127,14 +125,12 @@ void Player::animate(float dt)
     }
 }
 
-
 void Player::update()
 {
     bool moved = false;
     Direction newDir = currentDirection;
 
-    animate(0.016f); // albo dt z Engine
-
+    animate(0.016f);
 
     sf::Vector2f oldPosition = getPosition();
     sf::Vector2f movement(0.f, 0.f);
@@ -158,9 +154,7 @@ void Player::update()
 
     sf::Vector2f newPosition = calculateNewPosition(movement);
 
-
     if (moved && isPositionValid(newPosition)) {
-        // Ustaw nową pozycję
         setPosition(newPosition.x, newPosition.y);
         lastValidPosition = newPosition;
 
@@ -169,16 +163,14 @@ void Player::update()
         }
     } else if (moved) {
         if (!checkCollisionWithBounds()) {
-            // Gracz wyszedł poza granice - cofnij ruch
             setPosition(oldPosition.x, oldPosition.y);
             moved = false;
         } else {
-            // Zapisz poprawną pozycję
             lastValidPosition = getPosition();
 
             if (newDir != currentDirection)
                 setDirection(newDir);
-            // Spróbuj osobno ruch w osi X i Y
+
             sf::Vector2f xMovement(movement.x, 0);
             sf::Vector2f yMovement(0, movement.y);
 
@@ -189,13 +181,11 @@ void Player::update()
             bool yValid = isPositionValid(yPosition);
 
             if (xValid && !yValid) {
-                // Możliwy tylko ruch w osi X
                 setPosition(xPosition.x, xPosition.y);
                 lastValidPosition = xPosition;
                 if (movement.x < 0) newDir = Direction::LEFT;
                 else if (movement.x > 0) newDir = Direction::RIGHT;
             } else if (!xValid && yValid) {
-                // Możliwy tylko ruch w osi Y
                 setPosition(yPosition.x, yPosition.y);
                 lastValidPosition = yPosition;
                 if (movement.y < 0) newDir = Direction::UP;
@@ -223,7 +213,6 @@ bool Player::isOutOfBounds() const {
 
 void Player::keepInBounds() {
     if (isOutOfBounds()) {
-        // Przywróć ostatnią poprawną pozycję
         setPosition(lastValidPosition.x, lastValidPosition.y);
     }
 }
@@ -238,8 +227,6 @@ void Player::setPosition(float x, float y) {
 
 bool Player::checkCollisionWithBounds() const {
     sf::FloatRect playerBounds = getGlobalBounds();
-
-    // Sprawdź czy gracz jest całkowicie wewnątrz granic
     return boundaries.contains(playerBounds.left, playerBounds.top) &&
            boundaries.contains(playerBounds.left + playerBounds.width,
                               playerBounds.top + playerBounds.height);
@@ -247,77 +234,213 @@ bool Player::checkCollisionWithBounds() const {
 
 void Player::clampToBounds() {
     sf::FloatRect playerBounds = getGlobalBounds();
-    sf::Vector2f  newPosition = getPosition();
+    sf::Vector2f newPosition = getPosition();
 
-    // Jeśli gracz jest poza lewą krawędzią
     if (playerBounds.left < boundaries.left) {
         newPosition.x += (boundaries.left - playerBounds.left);
     }
-    // Jeśli gracz jest poza prawą krawędzią
     else if (playerBounds.left + playerBounds.width > boundaries.left + boundaries.width) {
         newPosition.x -= (playerBounds.left + playerBounds.width - (boundaries.left + boundaries.width));
     }
 
-    // Jeśli gracz jest poza górną krawędzią
     if (playerBounds.top < boundaries.top) {
         newPosition.y += (boundaries.top - playerBounds.top);
     }
-    // Jeśli gracz jest poza dolną krawędzią
     else if (playerBounds.top + playerBounds.height > boundaries.top + boundaries.height) {
         newPosition.y -= (playerBounds.top + playerBounds.height - (boundaries.top + boundaries.height));
     }
 
+    setPosition(newPosition.x, newPosition.y);
+}
 
+// Nowe funkcje dla dokładnych hitboxów
+void Player::addCollisionRectangle(const sf::FloatRect& rect) {
+    RectangleShape shape;
+    shape.rect = rect;
+    collisionShapes.push_back(shape);
+}
+
+void Player::addCollisionCircle(const sf::Vector2f& center, float radius) {
+    CircleShape shape;
+    shape.center = center;
+    shape.radius = radius;
+    collisionShapes.push_back(shape);
+}
+
+void Player::addCollisionPolygon(const std::vector<sf::Vector2f>& points) {
+    PolygonShape shape;
+    shape.points = points;
+    collisionShapes.push_back(shape);
+}
+
+void Player::clearCollisionShapes() {
+    collisionShapes.clear();
+}
+
+bool Player::checkCollisionWithShapes() const {
+    sf::FloatRect playerBounds = getGlobalBounds();
+    for (const auto& shape : collisionShapes) {
+        if (shapeIntersectsRect(shape, playerBounds)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Stare funkcje dla kompatybilności
+void Player::addCollisionObject(const sf::FloatRect& object) {
+    // Dodaj jako prostokąt do nowego systemu
+    addCollisionRectangle(object);
+    // I do starego systemu dla kompatybilności
+    collisionObjects.push_back(object);
+}
+
+void Player::clearCollisionObjects() {
+    collisionShapes.clear();
+    collisionObjects.clear();
+}
+
+bool Player::checkCollisionWithObjects() const {
+    return checkCollisionWithShapes();
+}
+
+sf::Vector2f Player::calculateNewPosition(const sf::Vector2f& movement) const {
+    sf::Vector2f currentPos = getPosition();
+    return sf::Vector2f(currentPos.x + movement.x, currentPos.y + movement.y);
+}
+
+// Funkcje pomocnicze do kolizji
+bool Player::rectangleIntersectsRect(const sf::FloatRect& rect1, const sf::FloatRect& rect2) {
+    return rect1.intersects(rect2);
+}
+
+bool Player::circleIntersectsRect(const sf::Vector2f& center, float radius, const sf::FloatRect& rect) {
+    // Znajdź najbliższy punkt w prostokącie do środka koła
+    float closestX = std::max(rect.left, std::min(center.x, rect.left + rect.width));
+    float closestY = std::max(rect.top, std::min(center.y, rect.top + rect.height));
+
+    // Oblicz odległość między tym punktem a środkiem koła
+    float distanceX = center.x - closestX;
+    float distanceY = center.y - closestY;
+
+    return (distanceX * distanceX + distanceY * distanceY) <= (radius * radius);
+}
+
+bool Player::pointInPolygon(const sf::Vector2f& point, const std::vector<sf::Vector2f>& polygon) {
+    if (polygon.size() < 3) return false;
+
+    bool inside = false;
+    for (size_t i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
+        if (((polygon[i].y > point.y) != (polygon[j].y > point.y)) &&
+            (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) /
+             (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+            inside = !inside;
+        }
+    }
+    return inside;
+}
+
+bool Player::polygonIntersectsRect(const std::vector<sf::Vector2f>& polygon, const sf::FloatRect& rect) {
+    if (polygon.empty()) return false;
+
+    // 1. Sprawdź czy którykolwiek wierzchołek wielokąta jest wewnątrz prostokąta
+    for (const auto& point : polygon) {
+        if (rect.contains(point)) {
+            return true;
+        }
     }
 
-    void Player::addCollisionObject(const sf::FloatRect& object) {
-        collisionObjects.push_back(object);
+    // 2. Sprawdź czy którykolwiek wierzchołek prostokąta jest wewnątrz wielokąta
+    sf::Vector2f rectPoints[4] = {
+        {rect.left, rect.top},
+        {rect.left + rect.width, rect.top},
+        {rect.left + rect.width, rect.top + rect.height},
+        {rect.left, rect.top + rect.height}
+    };
+
+    for (int i = 0; i < 4; i++) {
+        if (pointInPolygon(rectPoints[i], polygon)) {
+            return true;
+        }
     }
 
-    void Player::clearCollisionObjects() {
-        collisionObjects.clear();
-    }
+    // 3. Sprawdź przecięcia krawędzi
+    for (size_t i = 0; i < polygon.size(); i++) {
+        size_t j = (i + 1) % polygon.size();
 
-    bool Player::checkCollisionWithObjects() const {
-        sf::FloatRect playerBounds = getGlobalBounds();
+        sf::Vector2f p1 = polygon[i];
+        sf::Vector2f p2 = polygon[j];
 
-        for (const auto& obj : collisionObjects) {
-            if (playerBounds.intersects(obj)) {
+        // Sprawdź przecięcie z każdą krawędzią prostokąta
+        // Górna krawędź
+        if ((p1.y <= rect.top && p2.y >= rect.top) || (p2.y <= rect.top && p1.y >= rect.top)) {
+            float x = p1.x + (rect.top - p1.y) * (p2.x - p1.x) / (p2.y - p1.y);
+            if (x >= rect.left && x <= rect.left + rect.width) {
                 return true;
             }
         }
 
-        return false;
+        // Dolna krawędź
+        if ((p1.y <= rect.top + rect.height && p2.y >= rect.top + rect.height) ||
+            (p2.y <= rect.top + rect.height && p1.y >= rect.top + rect.height)) {
+            float x = p1.x + (rect.top + rect.height - p1.y) * (p2.x - p1.x) / (p2.y - p1.y);
+            if (x >= rect.left && x <= rect.left + rect.width) {
+                return true;
+            }
+        }
+
+        // Lewa krawędź
+        if ((p1.x <= rect.left && p2.x >= rect.left) || (p2.x <= rect.left && p1.x >= rect.left)) {
+            float y = p1.y + (rect.left - p1.x) * (p2.y - p1.y) / (p2.x - p1.x);
+            if (y >= rect.top && y <= rect.top + rect.height) {
+                return true;
+            }
+        }
+
+        // Prawa krawędź
+        if ((p1.x <= rect.left + rect.width && p2.x >= rect.left + rect.width) ||
+            (p2.x <= rect.left + rect.width && p1.x >= rect.left + rect.width)) {
+            float y = p1.y + (rect.left + rect.width - p1.x) * (p2.y - p1.y) / (p2.x - p1.x);
+            if (y >= rect.top && y <= rect.top + rect.height) {
+                return true;
+            }
+        }
     }
 
-    bool Player::checkCollisionWithObject(const sf::FloatRect& object) const {
-        return getGlobalBounds().intersects(object);
-    }
+    return false;
+}
 
-    sf::Vector2f Player::calculateNewPosition(const sf::Vector2f& movement) const {
-        sf::Vector2f currentPos = getPosition();
-        return sf::Vector2f(currentPos.x + movement.x, currentPos.y + movement.y);
+bool Player::shapeIntersectsRect(const CollisionShape& shape, const sf::FloatRect& rect) {
+    if (const RectangleShape* rectangle = std::get_if<RectangleShape>(&shape)) {
+        return rectangleIntersectsRect(rectangle->rect, rect);
     }
+    else if (const CircleShape* circle = std::get_if<CircleShape>(&shape)) {
+        return circleIntersectsRect(circle->center, circle->radius, rect);
+    }
+    else if (const PolygonShape* polygon = std::get_if<PolygonShape>(&shape)) {
+        return polygonIntersectsRect(polygon->points, rect);
+    }
+    return false;
+}
 
 bool Player::isPositionValid(const sf::Vector2f& position) const {
     sf::FloatRect tempBounds = getGlobalBounds();
     tempBounds.left = position.x;
     tempBounds.top = position.y;
 
-    bool boundsOk =
-        boundaries.contains(tempBounds.left, tempBounds.top) &&
-        boundaries.contains(tempBounds.left + tempBounds.width,
-                            tempBounds.top + tempBounds.height);
-
+    // 1. Sprawdź granice okna
+    bool boundsOk = boundaries.contains(tempBounds.left, tempBounds.top) &&
+                    boundaries.contains(tempBounds.left + tempBounds.width,
+                                       tempBounds.top + tempBounds.height);
     if (!boundsOk)
         return false;
 
-    for (const auto& obj : collisionObjects) {
-        if (tempBounds.intersects(obj))
+    // 2. Sprawdź kolizję z kształtami (nowy system)
+    for (const auto& shape : collisionShapes) {
+        if (shapeIntersectsRect(shape, tempBounds)) {
             return false;
+        }
     }
 
-    return true; // <── DODAJ TO
+    return true;
 }
-
-

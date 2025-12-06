@@ -20,7 +20,6 @@ public:
     void drawPolyLine(const std::vector<sf::Vector2f> &points, bool closed, sf::Color color);
     void drawCircle(float x, float y, float radius, sf::Color color, sf::Color color2 = sf::Color::Transparent);
     void drawCircleSymmetric(float x0, float y0, float R, sf::Color color);
-    void drawElipse(float x0, float y0, float Rx, float Ry, sf::Color color);
     void drawEllipseSymmetric(float x0, float y0, float Rx, float Ry, sf::Color color);
     void drawPolygon(int sides, float sideLength, sf::Vector2f center, float startAngle, sf::Color color);
 

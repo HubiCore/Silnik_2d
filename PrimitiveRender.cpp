@@ -102,26 +102,6 @@ void PrimitiveRenderer::drawCircleSymmetric(float x0, float y0, float R, sf::Col
     }
 }
 
-void PrimitiveRenderer::drawElipse(float x0, float y0, float Rx, float Ry, sf::Color color) {
-    if (!target) return;
-
-    sf::ConvexShape elipse;
-    unsigned int detail = 100;
-    elipse.setPointCount(detail);
-
-    for (unsigned int i = 0; i < detail; ++i) {
-        float rad = 2 * M_PI * i / detail;
-        float x = std::cos(rad) * Rx;
-        float y = std::sin(rad) * Ry;
-        elipse.setPoint(i, sf::Vector2f(x, y));
-    }
-
-    elipse.setPosition(x0, y0);
-    elipse.setFillColor(color);
-    elipse.setOrigin(Rx, Ry);
-    target->draw(elipse);
-}
-
 void PrimitiveRenderer::drawEllipseSymmetric(float x0, float y0, float Rx, float Ry, sf::Color color) {
     if (!target) return;
 
