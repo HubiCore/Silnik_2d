@@ -1,37 +1,42 @@
-/*#include "helpers.hpp"
-#include "../Point2D.hpp"
-#include "../LineSegment.hpp"
+#include "Helpers.hpp"
 #include <cmath>
 
 // ============================================================================
-// HELPER CLASSES FOR DRAWING
+// HELPER CLASSES IMPLEMENTATION
 // ============================================================================
 
-class DrawablePoint2D : public Point2D {
-private:
-    sf::Color color;
-public:
-    DrawablePoint2D(float x = 0, float y = 0, sf::Color color = sf::Color::White)
-        : Point2D(x, y), color(color) {}
+// DrawablePoint2D
+DrawablePoint2D::DrawablePoint2D(float x, float y, sf::Color color)
+    : Point2D(x, y), color(color) {}
 
-    void setColor(sf::Color newColor) { color = newColor; }
-    sf::Color getColor() const { return color; }
+void DrawablePoint2D::setColor(sf::Color newColor) {
+    color = newColor;
+}
 
-    void draw(class PrimitiveRenderer& renderer) const;
-};
+sf::Color DrawablePoint2D::getColor() const {
+    return color;
+}
 
-class DrawableLineSegment : public LineSegment {
-private:
-    sf::Color color;
-public:
-    DrawableLineSegment(const Point2D& p1, const Point2D& p2, sf::Color color = sf::Color::White)
-        : LineSegment(p1, p2), color(color) {}
+void DrawablePoint2D::draw(PrimitiveRenderer& renderer) const {
+    renderer.drawPoint(getX(), getY(), color);
+}
 
-    void setColor(sf::Color newColor) { color = newColor; }
-    sf::Color getColor() const { return color; }
+// DrawableLineSegment
+DrawableLineSegment::DrawableLineSegment(const Point2D& p1, const Point2D& p2, sf::Color color)
+    : LineSegment(p1, p2), color(color) {}
 
-    void draw(class PrimitiveRenderer& renderer) const;
-};
+void DrawableLineSegment::setColor(sf::Color newColor) {
+    color = newColor;
+}
+
+sf::Color DrawableLineSegment::getColor() const {
+    return color;
+}
+
+void DrawableLineSegment::draw(PrimitiveRenderer& renderer) const {
+    renderer.drawLine(getP1().getX(), getP1().getY(),
+                      getP2().getX(), getP2().getY(), color);
+}
 
 // ============================================================================
 // HELPER FUNCTIONS IMPLEMENTATION
@@ -40,6 +45,9 @@ public:
 std::vector<sf::Vector2f> calculatePolygonPoints(int sides, float radius,
                                                   sf::Vector2f center, float startAngle) {
     std::vector<sf::Vector2f> points;
+
+    if (sides < 3) return points; // Minimalnie 3 boki
+
     float angleStep = 2 * PI / sides;
 
     for (int i = 0; i < sides; ++i) {
@@ -97,12 +105,3 @@ std::vector<sf::Vector2f> createLineHitbox(float x1, float y1, float x2, float y
 
     return points;
 }
-
-// Implementacje metod rysujących
-void DrawablePoint2D::draw(PrimitiveRenderer& renderer) const {
-    renderer.drawPoint(getX(), getY(), color);
-}
-
-void DrawableLineSegment::draw(PrimitiveRenderer& renderer) const {
-    renderer.drawLine(getP1().getX(), getP1().getY(), getP2().getX(), getP2().getY(), color);
-}*/
