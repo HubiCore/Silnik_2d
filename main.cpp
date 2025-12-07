@@ -44,7 +44,7 @@ int main() {
     sf::FloatRect gameBounds(0, 0, 800, 600);
 
     // Create player
-    Player player(400.f, 300.f, 5.0f);
+    Player player(0.f, 530.f, 5.0f);
     player.setBoundaries(gameBounds);
 
     // Load player sprites
@@ -55,23 +55,23 @@ int main() {
     }
 
     // Display program information
-    std::cout << "========================================" << std::endl;
-    std::cout << "              2D ENGINE" << std::endl;
-    std::cout << "========================================" << std::endl;
-    std::cout << "HITBOX SYSTEM:" << std::endl;
-    std::cout << "  - Points:      Small circles (5px radius)" << std::endl;
-    std::cout << "  - Lines:       Thin rotated rectangles (2px)" << std::endl;
-    std::cout << "  - Circles:     Perfect circles" << std::endl;
-    std::cout << "  - Ellipses:    Polygon approximations (32 segments)" << std::endl;
-    std::cout << "  - Polygons:    Exact shapes" << std::endl;
-    std::cout << std::endl;
-    std::cout << "CONTROLS:" << std::endl;
-    std::cout << "  - Movement:    W, A, S, D" << std::endl;
-    std::cout << "  - Clear:       C (clear hitboxes)" << std::endl;
-    std::cout << "  - Fill:        LMB (flood fill), RMB (boundary fill)" << std::endl;
-    std::cout << "  - Exit:        ESC" << std::endl;
-    std::cout << "  - Debug:       P (position)" << std::endl;
-    std::cout << "========================================" << std::endl;
+    engine.log("========================================");
+    engine.log("              2D ENGINE");
+    engine.log("========================================");
+    engine.log("HITBOX SYSTEM:");
+    engine.log("  - Points:      Small circles (5px radius)");
+    engine.log("  - Lines:       Thin rotated rectangles (2px)");
+    engine.log("  - Circles:     Perfect circles");
+    engine.log("  - Ellipses:    Polygon approximations (32 segments)");
+    engine.log("  - Polygons:    Exact shapes");
+    engine.log("");
+    engine.log("CONTROLS:");
+    engine.log("  - Movement:    W, A, S, D");
+    engine.log("  - Clear:       C (clear hitboxes)");
+    engine.log("  - Fill:        LMB (flood fill), RMB (boundary fill)");
+    engine.log("  - Exit:        ESC");
+    engine.log("  - Debug:       P (position)");
+    engine.log("========================================");
 
     // Start main loop
     engine.log("Main loop started.");
