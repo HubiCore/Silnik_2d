@@ -7,10 +7,13 @@
 #include <vector>
 
 // Funkcje dla wielokątów
-void drawPolygonWithHitbox(PrimitiveRenderer& renderer, Player& player,
+void drawPolygonWithHitbox(PrimitiveRenderer &renderer, Player &player,
                            int sides, float sideLength,
                            sf::Vector2f center, float startAngle,
                            sf::Color color);
-void drawPredefinedPolygons(PrimitiveRenderer& renderer, Player& player);
 
+void drawPolygonWithoutHitbox(PrimitiveRenderer &renderer, Player &player,
+                           int sides, float sideLength,
+                           sf::Vector2f center, float startAngle,
+                           sf::Color color);
 #endif // POLYGONS_HPP

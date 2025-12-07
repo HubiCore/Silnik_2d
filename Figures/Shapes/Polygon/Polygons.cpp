@@ -18,3 +18,14 @@ void drawPolygonWithHitbox(PrimitiveRenderer& renderer, Player& player,
     // Dodaj hitbox (dokładny wielokąt)
     player.addCollisionPolygon(polygonPoints);
 }
+
+void drawPolygonWithoutHitbox(PrimitiveRenderer& renderer, Player& player,
+                           int sides, float sideLength,
+                           sf::Vector2f center, float startAngle,
+                           sf::Color color) {
+    // Oblicz promień na podstawie długości boku
+    float radius = sideLength / (2 * std::sin(PI / sides));
+
+    // Rysuj wielokąt
+    renderer.drawPolygon(sides, sideLength, center, startAngle, color);
+}

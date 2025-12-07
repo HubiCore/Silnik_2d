@@ -24,11 +24,35 @@ void drawAllFigures(PrimitiveRenderer& renderer, Player& player) {
     drawLineWithHitbox(renderer, player, 0, 599, 800, 599, sf::Color::Blue);
 
 
-    //Wielokąt
+    //Wielokąt z hitboxów
     std::vector<sf::Vector2f> polylinePoints = {
         {300,200}, {400,250}, {350,300}, {100,300}
     };
     drawPolylineWithHitboxes(renderer, player, polylinePoints, true, sf::Color::Cyan, 2.0f);
+
+    //Wielokąt z hitboxami
+    std::vector<sf::Vector2f> polylinePoints2 = {
+        {400,598}, {500,598}, {425,550}, {475,550}
+    };
+    drawPolylineWithHitboxes(renderer, player, polylinePoints2, true, sf::Color(200,200,200), 2.0f);
+    //Wypełnianie dwóch części kolorem
+    renderer.floodFill0(402,597,sf::Color(150,150,150),sf::Color(50,50,50));
+    renderer.floodFill0(446, 556,sf::Color(150,150,150),sf::Color(50,50,50));
+
+    //wielokąt jako waza bez hitboxów
+    std::vector<sf::Vector2f> polylinePoints3 = {
+        //podstawa
+        {445,549}, {455,549},
+        //prawa strona
+        {457,544}, {460,540},{458,538}, {458,535},
+        {460,533},{452,530},
+        //lewa strona
+        {448,530},{440,533},{442,535}, {441,538},
+        {440,540},{443,544}
+    };
+    drawPolylineWithoutHitboxes(renderer, player, polylinePoints3, true, sf::Color::Yellow, 2.0f);
+    //Wypełnianie wazy kolorem
+    renderer.floodFill0(447,548,sf::Color::Yellow,sf::Color(50,50,50));
 
     //Okręgi
     drawCircleWithHitbox(renderer, player, 600, 200, 40, sf::Color::Green, sf::Color::White);

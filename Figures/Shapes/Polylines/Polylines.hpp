@@ -10,6 +10,10 @@
 void drawPolylineWithHitboxes(PrimitiveRenderer& renderer, Player& player,
                               const std::vector<sf::Vector2f>& points,
                               bool closed, sf::Color color, float thickness = 2.0f);
-void drawPredefinedPolylines(PrimitiveRenderer& renderer, Player& player);
+
+void drawPolylineWithoutHitboxes(PrimitiveRenderer& renderer, Player& player,
+                              const std::vector<sf::Vector2f>& points,
+                              bool closed, sf::Color color, float thickness = 2.0f);
+
 
 #endif // POLYLINES_HPP

@@ -4,35 +4,52 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 set(SFML_STATIC_LIBRARIES FALSE)
-set(SFML_DIR "C:/SFML/lib/cmake/SFML")
+set(SFML_DIR "D:/Grafika/SFML/lib/cmake/SFML")
 
 find_package(SFML 2.6 COMPONENTS system window graphics audio REQUIRED)
 
 add_executable(PGK main.cpp
-        Engine.cpp
-        Engine.hpp
-        PrimitiveRenderer.hpp
-        Point2D.cpp
-        Point2D.hpp
-        PrimitiveRender.cpp
-        LineSegment.cpp
-        LineSegment.hpp
-        GameObjects.cpp
-        GameObjects.hpp
-        UpdatableObject.hpp
-        DrawableObject.hpp
-        TransformableObject.hpp
-        ShapeObject.hpp
-        Player.hpp
-        BitmapHandler.hpp
-        AnimatedObject.hpp
-        BitmapObject.hpp
-        BitmapHandler.cpp
-        BitmapObject.cpp
-        SpriteObject.hpp
-        SpriteObject.cpp
-        Player.cpp
-        AnimatedObject.cpp
+        Engine/Engine.cpp
+        Engine/Engine.hpp
+        Object/Renderer/PrimitiveRenderer.hpp
+        Figures/Point2D/Point2D.cpp
+        Figures/Point2D/Point2D.hpp
+        Object/Renderer/PrimitiveRender.cpp
+        Figures/LineSegment/LineSegment.cpp
+        Figures/LineSegment/LineSegment.hpp
+        Object/GameObject/GameObjects.cpp
+        Object/GameObject/GameObjects.hpp
+        Object/UpdatableObject.hpp
+        Object/DrawableObject.hpp
+        Object/TransformableObject.hpp
+        Object/ShapeObject.hpp
+        Player/Player.hpp
+        Object/BitmapHandler/BitmapHandler.hpp
+        Object/AnimatedObject/AnimatedObject.hpp
+        Object/BitmapObject/BitmapObject.hpp
+        Object/BitmapHandler/BitmapHandler.cpp
+        Object/BitmapObject/BitmapObject.cpp
+        Object/sprite/SpriteObject.hpp
+        Object/sprite/SpriteObject.cpp
+        Player/Player.cpp
+        Object/AnimatedObject/AnimatedObject.cpp
+        Figures/drawAllFigures/drawAllFigures.cpp
+        Figures/drawAllFigures/drawAllFigures.hpp
+        Object/BitmapObject/BitmapObject.cpp
+        Figures/Shapes/Helpers/Helpers.cpp
+        Figures/Shapes/Helpers/Helpers.hpp
+        Figures/Shapes/Points/Points.hpp
+        Figures/Shapes/Points/Points.cpp
+        Figures/Shapes/Lines/Lines.hpp
+        Figures/Shapes/Lines/Lines.cpp
+        Figures/Shapes/Polylines/Polylines.hpp
+        Figures/Shapes/Polylines/Polylines.cpp
+        Figures/Shapes/Circles/Circles.hpp
+        Figures/Shapes/Circles/Circles.cpp
+        Figures/Shapes/Elipses/Elipses.hpp
+        Figures/Shapes/Elipses/Elipses.cpp
+        Figures/Shapes/Polygon/Polygons.hpp
+        Figures/Shapes/Polygon/Polygons.cpp
 )
 
 target_link_libraries(PGK PRIVATE sfml-system sfml-window sfml-graphics sfml-audio)

@@ -16,7 +16,7 @@
 int main() {
     // Initialize graphics engine
     Engine engine;
-    if (!engine.init("2D Engine with Precise Hitboxes", 800, 600, false, 144)) {
+    if (!engine.init("2D Engine", 800, 600, false, 144)) {
         return -1;
     }
 
@@ -56,7 +56,7 @@ int main() {
 
     // Display program information
     std::cout << "========================================" << std::endl;
-    std::cout << "2D ENGINE WITH PRECISE HITBOXES" << std::endl;
+    std::cout << "              2D ENGINE" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << "HITBOX SYSTEM:" << std::endl;
     std::cout << "  - Points:      Small circles (5px radius)" << std::endl;
@@ -70,7 +70,7 @@ int main() {
     std::cout << "  - Clear:       C (clear hitboxes)" << std::endl;
     std::cout << "  - Fill:        LMB (flood fill), RMB (boundary fill)" << std::endl;
     std::cout << "  - Exit:        ESC" << std::endl;
-    std::cout << "  - Debug:       P (position), D (info)" << std::endl;
+    std::cout << "  - Debug:       P (position)" << std::endl;
     std::cout << "========================================" << std::endl;
 
     // Start main loop

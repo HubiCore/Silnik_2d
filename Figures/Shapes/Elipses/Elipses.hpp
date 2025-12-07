@@ -10,6 +10,7 @@
 void drawEllipseWithHitbox(PrimitiveRenderer& renderer, Player& player,
                            float centerX, float centerY, float radiusX, float radiusY,
                            sf::Color color, int segments = 32);
-void drawPredefinedEllipses(PrimitiveRenderer& renderer, Player& player);
-
+void drawEllipseWithoutHitbox(PrimitiveRenderer& renderer, Player& player,
+                           float centerX, float centerY, float radiusX, float radiusY,
+                           sf::Color color, int segments = 32);
 #endif // ELLIPSES_HPP

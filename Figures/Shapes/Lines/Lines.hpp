@@ -9,6 +9,8 @@
 void drawLineWithHitbox(PrimitiveRenderer& renderer, Player& player,
                         float x1, float y1, float x2, float y2,
                         sf::Color color, float thickness = 2.0f);
-void drawPredefinedLines(PrimitiveRenderer& renderer, Player& player);
 
+void drawLineWithHitoutbox(PrimitiveRenderer& renderer, Player& player,
+                        float x1, float y1, float x2, float y2,
+                        sf::Color color, float thickness = 2.0f);
 #endif // LINES_HPP
