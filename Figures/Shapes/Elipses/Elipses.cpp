@@ -1,38 +1,56 @@
-#include "Elipses.hpp"
-#include "../Helpers/Helpers.hpp"
-#include <cmath>
+#ifndef ELLIPSES_HPP
+#define ELLIPSES_HPP
 
+#include "../../../Object/Renderer/PrimitiveRenderer.hpp"
+#include "../../../Player/Player.hpp"
+#include <SFML/Graphics.hpp>
+#include <vector>
+
+/**
+ * @file Elipses.hpp
+ * @brief Deklaracje funkcji do rysowania elips z obsługą kolizji
+ * @ingroup Graphics
+ */
+
+/**
+ * @brief Rysuje elipsę z hitboxem do wykrywania kolizji
+ *
+ * Funkcja rysuje elipsę za pomocą renderera
+ * Hitbox jest aproksymowany wielokątem o określonej liczbie segmentów dla lepszej dokładności wykrywania kolizji.
+ * @param renderer Referencja do obiektu renderera rysującego prymitywy
+ * @param player Referencja do obiektu gracza, do którego dodawany jest hitbox
+ * @param centerX Współrzędna X środka elipsy
+ * @param centerY Współrzędna Y środka elipsy
+ * @param radiusX Promień elipsy w osi X
+ * @param radiusY Promień elipsy w osi Y
+ * @param color Kolor elipsy w formacie SFML Color
+ * @param segments Liczba segmentów używanych do aproksymacji elipsy (domyślnie 32)
+ * @see drawEllipseWithoutHitbox()
+ * @see PrimitiveRenderer::drawEllipseSymmetric()
+ * @see Player::addCollisionPolygon()
+ */
 void drawEllipseWithHitbox(PrimitiveRenderer& renderer, Player& player,
                            float centerX, float centerY, float radiusX, float radiusY,
-                           sf::Color color, int segments) {
-    // Rysuj elipsę
-    renderer.drawEllipseSymmetric(centerX, centerY, radiusX, radiusY, color);
+                           sf::Color color, int segments = 32);
 
-    // Przygotuj punkty dla przybliżenia wielokątem
-    std::vector<sf::Vector2f> ellipsePoints;
-    for (int i = 0; i < segments; i++) {
-        float angle = 2 * PI * i / segments;
-        float x = centerX + radiusX * std::cos(angle);
-        float y = centerY + radiusY * std::sin(angle);
-        ellipsePoints.push_back(sf::Vector2f(x, y));
-    }
-
-    // Dodaj hitbox (przybliżenie wielokątem)
-    player.addCollisionPolygon(ellipsePoints);
-}
-
+/**
+ * @brief Rysuje elipsę bez hitboxu kolizyjnego
+ *
+ * Funkcja rysuje elipsę za pomocą renderera bez dodawania hitboxu do gracza.
+ * @param renderer Referencja do obiektu renderera rysującego prymitywy
+ * @param player Referencja do obiektu gracza (parametr dla zachowania zgodności interfejsu)
+ * @param centerX Współrzędna X środka elipsy
+ * @param centerY Współrzędna Y środka elipsy
+ * @param radiusX Promień elipsy w osi X
+ * @param radiusY Promień elipsy w osi Y
+ * @param color Kolor elipsy w formacie SFML Color
+ * @param segments Liczba segmentów używanych do aproksymacji elipsy (domyślnie 32)
+ *
+ * @see drawEllipseWithHitbox()
+ * @see PrimitiveRenderer::drawEllipseSymmetric()
+ */
 void drawEllipseWithoutHitbox(PrimitiveRenderer& renderer, Player& player,
                            float centerX, float centerY, float radiusX, float radiusY,
-                           sf::Color color, int segments) {
-    // Rysuj elipsę
-    renderer.drawEllipseSymmetric(centerX, centerY, radiusX, radiusY, color);
+                           sf::Color color, int segments = 32);
 
-    // Przygotuj punkty dla przybliżenia wielokątem
-    std::vector<sf::Vector2f> ellipsePoints;
-    for (int i = 0; i < segments; i++) {
-        float angle = 2 * PI * i / segments;
-        float x = centerX + radiusX * std::cos(angle);
-        float y = centerY + radiusY * std::sin(angle);
-        ellipsePoints.push_back(sf::Vector2f(x, y));
-    }
-}
+#endif // ELLIPSES_HPP
