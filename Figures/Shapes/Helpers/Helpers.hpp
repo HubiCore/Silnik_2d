@@ -154,8 +154,6 @@ std::vector<sf::Vector2f> calculatePolygonPoints(int sides, float radius, sf::Ve
  * @param thickness Grubość linii (domyślnie 2.0f)
  * @return Wektor 4 punktów tworzących prostokątny hitbox
  *
- * @note W przypadku bardzo krótkich linii (< 0.001f) tworzy kwadratowy hitbox
- * @warning Długość linii obliczana jest za pomocą pierwiastka kwadratowego
  *
  * @see calculatePolygonPoints()
  */

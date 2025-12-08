@@ -24,8 +24,6 @@
  * @param color Kolor punktu
  * @param hitboxRadius Promień hitboxu
  *
- * @todo Dodać walidację parametrów (np. sprawdzenie czy hitboxRadius > 0)
- * @bug Przy bardzo małych hitboxRadius (< 1.0) mogą wystąpić problemy z kolizjami
  */
 void drawPointWithHitbox(PrimitiveRenderer& renderer, Player& player,
                          float x, float y, sf::Color color, float hitboxRadius) {
@@ -50,7 +48,6 @@ void drawPointWithHitbox(PrimitiveRenderer& renderer, Player& player,
  * @param color Kolor punktu
  * @param hitboxRadius Parametr ignorowany
  *
- * @note Funkcja jest przestarzała - lepiej użyć bezpośrednio:
  * @code
  * DrawablePoint2D point(x, y, color);
  * point.draw(renderer);

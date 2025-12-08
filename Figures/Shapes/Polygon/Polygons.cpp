@@ -6,7 +6,6 @@
  * Wykorzystuje obliczenia geometryczne do generowania wierzchołków
  * wielokątów foremnych.
  *
- * @note Wymaga stałej PI zdefiniowanej w Helpers.hpp
  */
 
 #include "Polygons.hpp"
@@ -43,14 +42,7 @@
  * @post Do gracza dodano hitbox w kształcie wielokąta
  * @post Wielokąt został narysowany na rendererze
  *
- * @todo Dodać optymalizację dla dużych liczby boków (> 100)
- * @todo Zaimplementować caching obliczonych promieni dla często używanych konfiguracji
  *
- * @bug Dla bardzo małych sideLength (< 0.1) mogą wystąpić problemy numeryczne
- * @bug Dla sides > 1000 może spaść wydajność
- *
- * @test Test jednostkowy powinien sprawdzać poprawność obliczeń dla różnych wartości sides
- * @test Test kolizji dla wielokątów o dużej liczbie boków
  */
 void drawPolygonWithHitbox(PrimitiveRenderer& renderer, Player& player,
                            int sides, float sideLength,

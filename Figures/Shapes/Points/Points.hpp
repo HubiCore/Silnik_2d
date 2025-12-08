@@ -37,8 +37,6 @@
  * @param color Kolor punktu w formacie sf::Color
  * @param hitboxRadius Promień hitboxu w pikselach (domyślnie 5.0)
  *
- * @warning Hitbox jest dodawany do gracza - upewnij się, że obiekt Player
- *          zarządza pamięcią dla hitboxów prawidłowo
  *
  * @see Player::addCollisionCircle()
  * @see DrawablePoint2D
@@ -59,10 +57,6 @@ void drawPointWithHitbox(PrimitiveRenderer& renderer, Player& player,
  * @param color Kolor punktu w formacie sf::Color
  * @param hitboxRadius Parametr ignorowany, zachowany dla zgodności (domyślnie 5.0)
  *
- * @note Parametr player nie jest używany, ale pozostawiono go dla
- *       spójności z drawPointWithHitbox()
- *
- * @deprecated Rozważ użycie bezpośrednio DrawablePoint2D dla czysto wizualnych punktów
  */
 void drawPointWithoutHitbox(PrimitiveRenderer& renderer, Player& player,
                          float x, float y, sf::Color color, float hitboxRadius = 5.0f);
