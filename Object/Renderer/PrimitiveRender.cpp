@@ -1,3 +1,13 @@
+/**
+ * @file PrimitiveRenderer.cpp
+ * @brief Implementacja klasy PrimitiveRenderer
+ * @ingroup Renderer
+ *
+ * Implementacja metod klasy PrimitiveRenderer zdefiniowanych w PrimitiveRenderer.hpp.
+ * Zawiera logikę rysowania prymitywów graficznych oraz algorytmy wypełniania obszarów.
+ * Wykorzystuje bibliotekę SFML do operacji na pikselach i renderowania.
+ */
+
 #include "../Renderer/PrimitiveRenderer.hpp"
 #include <cmath>
 #include <functional>
@@ -6,12 +16,29 @@
 #include <stdio.h>
 #include <queue>
 
+/**
+ * @brief Konstruktor klasy PrimitiveRenderer
+ * @param target Wskaźnik do celu renderowania (domyślnie nullptr)
+ */
 PrimitiveRenderer::PrimitiveRenderer(sf::RenderTarget* target) : target(target) {}
 
+/**
+ * @brief Ustawia cel renderowania
+ * @param target Wskaźnik do celu renderowania
+ */
 void PrimitiveRenderer::setTarget(sf::RenderTarget* target) {
     this->target = target;
 }
 
+/**
+ * @brief Rysuje pojedynczy punkt
+ * @param x Współrzędna X punktu
+ * @param y Współrzędna Y punktu
+ * @param color Kolor punktu
+ *
+ * Metoda rysuje punkt używając prymitywu sf::Points.
+ * Jeśli cel renderowania nie jest ustawiony, operacja jest ignorowana.
+ */
 void PrimitiveRenderer::drawPoint(float x, float y, sf::Color color) {
     if (!target) return;
 
@@ -19,6 +46,16 @@ void PrimitiveRenderer::drawPoint(float x, float y, sf::Color color) {
     target->draw(&point, 1, sf::Points);
 }
 
+/**
+ * @brief Rysuje linię (algorytm natywny SFML)
+ * @param x1 Współrzędna X początku linii
+ * @param y1 Współrzędna Y początku linii
+ * @param x2 Współrzędna X końca linii
+ * @param y2 Współrzędna Y końca linii
+ * @param color Kolor linii
+ *
+ * Metoda rysuje linię używając prymitywu sf::Lines.
+ */
 void PrimitiveRenderer::drawLine(float x1, float y1, float x2, float y2, sf::Color color) {
     if (!target) return;
 
@@ -26,6 +63,17 @@ void PrimitiveRenderer::drawLine(float x1, float y1, float x2, float y2, sf::Col
     target->draw(line, 2, sf::Lines);
 }
 
+/**
+ * @brief Rysuje linię algorytmem przyrostowym
+ * @param x1 Współrzędna X początku linii
+ * @param y1 Współrzędna Y początku linii
+ * @param x2 Współrzędna X końca linii
+ * @param y2 Współrzędna Y końca linii
+ * @param color Kolor linii
+ *
+ * Algorytm DDA (Digital Differential Analyzer) oblicza przyrosty współrzędnych
+ * i rysuje linię jako sekwencję punktów. Działa dla wszystkich kierunków linii.
+ */
 void PrimitiveRenderer::drawLineIncremental(float x1, float y1, float x2, float y2, sf::Color color) {
     if (!target) return;
 
@@ -51,6 +99,15 @@ void PrimitiveRenderer::drawLineIncremental(float x1, float y1, float x2, float 
     }
 }
 
+/**
+ * @brief Rysuje łamaną lub wielokąt
+ * @param points Wektor punktów definiujących łamaną
+ * @param closed Czy łamana ma być zamknięta (wielokąt)
+ * @param color Kolor linii
+ *
+ * Metoda łączy kolejne punkty liniami. Jeśli parametr closed jest true,
+ * dodatkowo łączy ostatni punkt z pierwszym, tworząc zamknięty wielokąt.
+ */
 void PrimitiveRenderer::drawPolyLine(const std::vector<sf::Vector2f> &points, bool closed, sf::Color color) {
     if (!target || points.size() < 2) return;
 
@@ -62,6 +119,17 @@ void PrimitiveRenderer::drawPolyLine(const std::vector<sf::Vector2f> &points, bo
     }
 }
 
+/**
+ * @brief Rysuje okrąg (metoda z wykorzystaniem SFML CircleShape)
+ * @param x Współrzędna X środka okręgu
+ * @param y Współrzędna Y środka okręgu
+ * @param radius Promień okręgu
+ * @param color Kolor wypełnienia okręgu
+ * @param color2 Kolor obramowania okręgu
+ *
+ * Metoda wykorzystuje wbudowany kształt okręgu SFML, co zapewnia szybkie
+ * renderowanie i możliwość wypełnienia oraz obramowania.
+ */
 void PrimitiveRenderer::drawCircle(float x, float y, float radius, sf::Color color, sf::Color color2) {
     if (!target) return;
 
@@ -73,12 +141,23 @@ void PrimitiveRenderer::drawCircle(float x, float y, float radius, sf::Color col
     target->draw(shape);
 }
 
+/**
+ * @brief Rysuje okrąg algorytmem symetrycznym (Bresenham)
+ * @param x0 Współrzędna X środka okręgu
+ * @param y0 Współrzędna Y środka okręgu
+ * @param R Promień okręgu
+ * @param color Kolor okręgu
+ *
+ * Algorytm wykorzystuje symetrię okręgu do rysowania 8 punktów na każdą iterację.
+ * Bazuje na algorytmie Bresenham'a z decyzją opartą na zmiennej d.
+ */
 void PrimitiveRenderer::drawCircleSymmetric(float x0, float y0, float R, sf::Color color) {
     if (!target) return;
 
     float x = 0, y = R;
     float d = 3 - 2 * R;
 
+    // Lambda rysująca 8 symetrycznych punktów okręgu
     auto draw8 = [&](float x, float y) {
         drawPoint(x0 + x, y0 + y, color);
         drawPoint(x0 - x, y0 + y, color);
@@ -102,6 +181,19 @@ void PrimitiveRenderer::drawCircleSymmetric(float x0, float y0, float R, sf::Col
     }
 }
 
+/**
+ * @brief Rysuje elipsę algorytmem symetrycznym
+ * @param x0 Współrzędna X środka elipsy
+ * @param y0 Współrzędna Y środka elipsy
+ * @param Rx Promień wzdłuż osi X
+ * @param Ry Promień wzdłuż osi Y
+ * @param color Kolor elipsy
+ *
+ * Algorytm Midpoint dla elipsy podzielony na dwie części:
+ * 1. Region 1: gdzie nachylenie < 1
+ * 2. Region 2: gdzie nachylenie >= 1
+ * Wykorzystuje symetrię elipsy do rysowania 4 punktów na iterację.
+ */
 void PrimitiveRenderer::drawEllipseSymmetric(float x0, float y0, float Rx, float Ry, sf::Color color) {
     if (!target) return;
 
@@ -113,6 +205,7 @@ void PrimitiveRenderer::drawEllipseSymmetric(float x0, float y0, float Rx, float
     float dx = 2 * Ry2 * x;
     float dy = 2 * Rx2 * y;
 
+    // Region 1: gdzie nachylenie < 1
     while (dx < dy) {
         drawPoint(x0 + x, y0 + y, color);
         drawPoint(x0 - x, y0 + y, color);
@@ -132,6 +225,7 @@ void PrimitiveRenderer::drawEllipseSymmetric(float x0, float y0, float Rx, float
         }
     }
 
+    // Region 2: gdzie nachylenie >= 1
     float p2 = Ry2 * (x + 0.5f) * (x + 0.5f) + Rx2 * (y - 1) * (y - 1) - Rx2 * Ry2;
     while (y >= 0) {
         drawPoint(x0 + x, y0 + y, color);
@@ -153,6 +247,18 @@ void PrimitiveRenderer::drawEllipseSymmetric(float x0, float y0, float Rx, float
     }
 }
 
+/**
+ * @brief Rysuje wielokąt foremny
+ * @param sides Liczba boków wielokąta (minimum 3)
+ * @param sideLength Długość boku wielokąta
+ * @param center Środek wielokąta
+ * @param startAngle Kąt początkowy w radianach
+ * @param color Kolor wielokąta
+ *
+ * Metoda oblicza wierzchołki wielokąta foremnego na podstawie liczby boków,
+ * długości boku i środka, a następnie rysuje go jako zamkniętą łamaną.
+ * Wykorzystuje wzory geometryczne do obliczenia pozycji wierzchołków.
+ */
 void PrimitiveRenderer::drawPolygon(int sides, float sideLength, sf::Vector2f center, float startAngle, sf::Color color) {
     if (!target || sides < 3) return;
 
@@ -170,6 +276,17 @@ void PrimitiveRenderer::drawPolygon(int sides, float sideLength, sf::Vector2f ce
     drawPolyLine(points, true, color);
 }
 
+/**
+ * @brief Wypełnia obszar algorytmem flood fill
+ * @param sx Współrzędna X punktu startowego
+ * @param sy Współrzędna Y punktu startowego
+ * @param fillColor Kolor wypełnienia
+ * @param backgroundColor Kolor tła do wypełnienia
+ *
+ * Algorytm wypełnia obszar o jednolitym kolorze (backgroundColor) zaczynając
+ * od punktu (sx, sy). Wykorzystuje iteracyjne podejście z kolejką (BFS).
+ * Pobiera aktualny obraz z celu renderowania i modyfikuje piksele.
+ */
 void PrimitiveRenderer::floodFill0(int sx, int sy, sf::Color fillColor, sf::Color backgroundColor) {
     if (!target) return;
 
@@ -217,6 +334,17 @@ void PrimitiveRenderer::floodFill0(int sx, int sy, sf::Color fillColor, sf::Colo
     target->draw(filledSprite);
 }
 
+/**
+ * @brief Wypełnia obszar algorytmem boundary fill
+ * @param sx Współrzędna X punktu startowego
+ * @param sy Współrzędna Y punktu startowego
+ * @param fillColor Kolor wypełnienia
+ * @param boundaryColor Kolor granicy obszaru
+ *
+ * Algorytm wypełnia obszar ograniczony granicą o kolorze boundaryColor.
+ * Wypełnianie zatrzymuje się po napotkaniu piksela o kolorze boundaryColor lub fillColor.
+ * Wykorzystuje iteracyjne podejście z kolejką (BFS).
+ */
 void PrimitiveRenderer::boundaryFillIterative0(int sx, int sy, sf::Color fillColor, sf::Color boundaryColor) {
     if (!target) return;
 

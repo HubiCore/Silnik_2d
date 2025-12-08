@@ -17,7 +17,6 @@ add_executable(PGK main.cpp
         Object/Renderer/PrimitiveRender.cpp
         Figures/LineSegment/LineSegment.cpp
         Figures/LineSegment/LineSegment.hpp
-        Object/GameObject/GameObjects.cpp
         Object/GameObject/GameObjects.hpp
         Object/UpdatableObject.hpp
         Object/DrawableObject.hpp
