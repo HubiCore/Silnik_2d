@@ -11,59 +11,68 @@ Player::Player(float x, float y, float speed)
     lastValidPosition = sf::Vector2f(x, y);
     createPlaceholderSprites();
     setDirection(Direction::DOWN);
-    sprite.setScale(0.5f, 0.5f);
+    setState(State::IDLE);
+    sprite.setScale(1.0f, 1.0f);
 }
 
 bool Player::loadSprites(const std::string& folder)
 {
     bool ok = true;
 
-    ok &= directionTextures[Direction::UP].loadFromFile(folder + "/up.png");
-    ok &= directionTextures[Direction::DOWN].loadFromFile(folder + "/down.png");
-    ok &= directionTextures[Direction::LEFT].loadFromFile(folder + "/left.png");
-    ok &= directionTextures[Direction::RIGHT].loadFromFile(folder + "/right.png");
+    if (loadAnimatedSprites(folder) || loadSpriteSheets(folder)) {
+        return true;
+    }
+
+    ok &= idleTextures[Direction::UP].loadFromFile(folder + "/up.png");
+    ok &= idleTextures[Direction::DOWN].loadFromFile(folder + "/down.png");
+    ok &= idleTextures[Direction::LEFT].loadFromFile(folder + "/left.png");
+    ok &= idleTextures[Direction::RIGHT].loadFromFile(folder + "/right.png");
 
     if (!ok) {
         std::cout << "Failed to load sprites. Using placeholders.\n";
         return false;
     }
 
-    // After loading textures, set the current one
-    setTexture(directionTextures[currentDirection]);
+    updateTextureForState();
     return true;
 }
 
 bool Player::loadAnimatedSprites(const std::string& folder)
 {
+
+    if (loadIdleSprites(folder)) {
+        std::cout << "Idle sprites loaded from: " << folder << std::endl;
+    }
+
     auto load = [&](Direction dir, const std::string& file) {
         sf::Texture tex;
         if (!tex.loadFromFile(folder + "/" + file))
             return false;
 
-        directionTextures[dir] = tex;
+        walkTextures[dir] = tex;
 
-        int w = tex.getSize().x / 4; // 4 klatki
+        int w = tex.getSize().x / 4;
+
         int h = tex.getSize().y;
 
         std::vector<sf::IntRect> frames;
         for (int i = 0; i < 4; i++)
             frames.push_back(sf::IntRect(i * w, 0, w, h));
 
-        directionFrames[dir] = frames;
+        walkFrames[dir] = frames;
 
         return true;
     };
 
     bool ok = true;
-    ok &= load(Direction::UP,    "up.png");
-    ok &= load(Direction::DOWN,  "down.png");
-    ok &= load(Direction::LEFT,  "left.png");
-    ok &= load(Direction::RIGHT, "right.png");
+    ok &= load(Direction::UP,    "up_walk.png");
+    ok &= load(Direction::DOWN,  "down_walk.png");
+    ok &= load(Direction::LEFT,  "left_walk.png");
+    ok &= load(Direction::RIGHT, "right_walk.png");
 
     if (ok) {
-        // Set current texture and frames
-        setTexture(directionTextures[currentDirection]);
-        setDirection(currentDirection); // This will update AnimatedObject
+        std::cout << "Walk animations loaded from: " << folder << std::endl;
+        updateTextureForState();
     }
 
     return ok;
@@ -71,12 +80,16 @@ bool Player::loadAnimatedSprites(const std::string& folder)
 
 bool Player::loadSpriteSheets(const std::string& folder)
 {
-    // Mapowanie nazw plików na kierunki
+
+    if (loadIdleSprites(folder)) {
+        std::cout << "Idle sprites loaded from: " << folder << std::endl;
+    }
+
     std::map<Direction, std::vector<std::string>> sheetFiles = {
-        {Direction::UP, {"up_strip.png", "up_sheet.png", "up_anim.png", "up.png"}},
-        {Direction::DOWN, {"down_strip.png", "down_sheet.png", "down_anim.png", "down.png"}},
-        {Direction::LEFT, {"left_strip.png", "left_sheet.png", "left_anim.png", "left.png"}},
-        {Direction::RIGHT, {"right_strip.png", "right_sheet.png", "right_anim.png", "right.png"}}
+        {Direction::UP, {"up_walk_strip.png", "up_walk_sheet.png", "up_walk_anim.png", "up_walk.png"}},
+        {Direction::DOWN, {"down_walk_strip.png", "down_walk_sheet.png", "down_walk_anim.png", "down_walk.png"}},
+        {Direction::LEFT, {"left_walk_strip.png", "left_walk_sheet.png", "left_walk_anim.png", "left_walk.png"}},
+        {Direction::RIGHT, {"right_walk_strip.png", "right_walk_sheet.png", "right_walk_anim.png", "right_walk.png"}}
     };
 
     bool ok = true;
@@ -88,7 +101,7 @@ bool Player::loadSpriteSheets(const std::string& folder)
             std::string path = folder + "/" + filename;
 
             if (std::filesystem::exists(path)) {
-                if (loadSpriteSheet(dir, path)) {
+                if (loadSpriteSheet(dir, path, 0, false)) {
                     loaded = true;
                     break;
                 }
@@ -96,21 +109,58 @@ bool Player::loadSpriteSheets(const std::string& folder)
         }
 
         if (!loaded) {
-            std::cout << "Sprite sheet not found for direction: " << static_cast<int>(dir) << std::endl;
+            std::cout << "Walk sprite sheet not found for direction: " << static_cast<int>(dir) << std::endl;
             ok = false;
         }
     }
 
-    // Set default texture and frames
     if (ok) {
-        setTexture(directionTextures[currentDirection]);
-        setDirection(currentDirection);
+        std::cout << "All walk animations loaded from: " << folder << std::endl;
+        updateTextureForState();
     }
 
     return ok;
 }
 
-bool Player::loadSpriteSheet(Direction dir, const std::string& filename, int frameCount)
+bool Player::loadIdleSprites(const std::string& folder)
+{
+    bool ok = true;
+
+    std::map<Direction, std::vector<std::string>> idleFiles = {
+        {Direction::UP, {"up_idle.png", "up.png"}},
+        {Direction::DOWN, {"down_idle.png", "down.png"}},
+        {Direction::LEFT, {"left_idle.png", "left.png"}},
+        {Direction::RIGHT, {"right_idle.png", "right.png"}}
+    };
+
+    for (const auto& [dir, filenames] : idleFiles) {
+        bool loaded = false;
+
+        for (const auto& filename : filenames) {
+            std::string path = folder + "/" + filename;
+
+            if (std::filesystem::exists(path)) {
+                sf::Texture tex;
+                if (tex.loadFromFile(path)) {
+                    idleTextures[dir] = tex;
+                    loaded = true;
+                    std::cout << "Loaded idle sprite for " << static_cast<int>(dir)
+                              << " from: " << path << std::endl;
+                    break;
+                }
+            }
+        }
+
+        if (!loaded) {
+            std::cout << "Idle sprite not found for direction: " << static_cast<int>(dir) << std::endl;
+            ok = false;
+        }
+    }
+
+    return ok;
+}
+
+bool Player::loadSpriteSheet(Direction dir, const std::string& filename, int frameCount, bool isIdle)
 {
     sf::Texture tex;
     if (!tex.loadFromFile(filename)) {
@@ -118,57 +168,58 @@ bool Player::loadSpriteSheet(Direction dir, const std::string& filename, int fra
         return false;
     }
 
-    directionTextures[dir] = tex;
-
-    sf::Vector2u size = tex.getSize();
-    int frameWidth;
-
-    if (frameCount > 0) {
-        frameWidth = size.x / frameCount;
+    if (isIdle) {
+        idleTextures[dir] = tex;
+        std::cout << "Loaded idle sprite sheet: " << filename
+                  << " for direction: " << static_cast<int>(dir) << std::endl;
+        return true;
     } else {
-        // Auto-detect based on common frame sizes
-        // Try 64x64 first, then 32x64, then 32x32
-        if (size.x % 64 == 0 && size.y == 64) {
-            frameCount = size.x / 64;  // 64x64 frames
-            std::cout << "Detected 64x64 frames: " << frameCount << " frames" << std::endl;
-        }
-        else if (size.x % 32 == 0 && size.y == 64) {
-            frameCount = size.x / 32;  // 32x64 frames
-            std::cout << "Detected 32x64 frames: " << frameCount << " frames" << std::endl;
-        }
-        else if (size.x % 32 == 0 && size.y == 32) {
-            frameCount = size.x / 32;  // 32x32 frames
-            std::cout << "Detected 32x32 frames: " << frameCount << " frames" << std::endl;
-        }
-        else {
-            // Default: assume 4 frames
-            frameCount = 4;
-            std::cout << "Could not detect frame size, using default: " << frameCount << " frames" << std::endl;
+        walkTextures[dir] = tex;
+
+        sf::Vector2u size = tex.getSize();
+        int frameWidth;
+
+        if (frameCount > 0) {
+            frameWidth = size.x / frameCount;
+        } else {
+
+            if (size.x % 64 == 0 && size.y == 64) {
+                frameCount = size.x / 64;
+            }
+            else if (size.x % 32 == 0 && size.y == 64) {
+                frameCount = size.x / 32;
+            }
+            else if (size.x % 32 == 0 && size.y == 32) {
+                frameCount = size.x / 32;
+            }
+            else {
+
+                frameCount = 4;
+            }
+
+            frameWidth = size.x / frameCount;
         }
 
-        frameWidth = size.x / frameCount;
+        std::vector<sf::IntRect> frames;
+        for (int i = 0; i < frameCount; i++) {
+            frames.push_back(sf::IntRect(i * frameWidth, 0, frameWidth, size.y));
+        }
+
+        walkFrames[dir] = frames;
+
+        std::cout << "Loaded walk sprite sheet: " << filename
+                  << " for direction: " << static_cast<int>(dir)
+                  << " (" << frameCount << " frames)" << std::endl;
+
+        return true;
     }
-
-    std::vector<sf::IntRect> frames;
-    for (int i = 0; i < frameCount; i++) {
-        frames.push_back(sf::IntRect(i * frameWidth, 0, frameWidth, size.y));
-    }
-
-    directionFrames[dir] = frames;
-
-    std::cout << "Loaded sprite sheet: " << filename
-              << " for direction: " << static_cast<int>(dir)
-              << " (" << frameCount << " frames, "
-              << frameWidth << "x" << size.y << " each)" << std::endl;
-
-    return true;
 }
 
 void Player::createPlaceholderSprites()
 {
-    auto makeTex = [](sf::Color c, Direction d) {
-        const int frameCount = 4;
-        const int frameWidth = 32;
+    auto makeTex = [](sf::Color c, Direction d, bool isWalk) {
+        const int frameCount = isWalk ? 4 : 1;
+        const int frameWidth = isWalk ? 32 : 32;
         const int frameHeight = 64;
 
         sf::Image img;
@@ -176,18 +227,18 @@ void Player::createPlaceholderSprites()
 
         for (int frame = 0; frame < frameCount; frame++) {
             sf::Color frameColor = c;
-            if (frame == 1) frameColor = sf::Color(c.r * 0.9, c.g * 0.9, c.b * 0.9);
-            if (frame == 2) frameColor = sf::Color(c.r * 0.8, c.g * 0.8, c.b * 0.8);
-            if (frame == 3) frameColor = sf::Color(c.r * 0.7, c.g * 0.7, c.b * 0.7);
+            if (isWalk) {
+                if (frame == 1) frameColor = sf::Color(c.r * 0.9, c.g * 0.9, c.b * 0.9);
+                if (frame == 2) frameColor = sf::Color(c.r * 0.8, c.g * 0.8, c.b * 0.8);
+                if (frame == 3) frameColor = sf::Color(c.r * 0.7, c.g * 0.7, c.b * 0.7);
+            }
 
             int frameOffset = frame * frameWidth;
 
-            // Body
             for (int y = 8; y < 24; y++)
                 for (int x = 8; x < 24; x++)
                     img.setPixel(frameOffset + x, y, frameColor);
 
-            // Direction indicator
             if (d == Direction::UP)
                 for (int x = 12; x < 20; x++)
                     for (int y = 4; y < 8; y++)
@@ -214,13 +265,17 @@ void Player::createPlaceholderSprites()
         return tex;
     };
 
-    directionTextures[Direction::UP]    = makeTex(sf::Color::Red,    Direction::UP);
-    directionTextures[Direction::DOWN]  = makeTex(sf::Color::Green,  Direction::DOWN);
-    directionTextures[Direction::LEFT]  = makeTex(sf::Color::Blue,   Direction::LEFT);
-    directionTextures[Direction::RIGHT] = makeTex(sf::Color::Yellow, Direction::RIGHT);
+    walkTextures[Direction::UP]    = makeTex(sf::Color::Red,    Direction::UP, true);
+    walkTextures[Direction::DOWN]  = makeTex(sf::Color::Green,  Direction::DOWN, true);
+    walkTextures[Direction::LEFT]  = makeTex(sf::Color::Blue,   Direction::LEFT, true);
+    walkTextures[Direction::RIGHT] = makeTex(sf::Color::Yellow, Direction::RIGHT, true);
 
-    // Create frames for placeholders
-    for (auto& [dir, tex] : directionTextures) {
+    idleTextures[Direction::UP]    = makeTex(sf::Color::Red,    Direction::UP, false);
+    idleTextures[Direction::DOWN]  = makeTex(sf::Color::Green,  Direction::DOWN, false);
+    idleTextures[Direction::LEFT]  = makeTex(sf::Color::Blue,   Direction::LEFT, false);
+    idleTextures[Direction::RIGHT] = makeTex(sf::Color::Yellow, Direction::RIGHT, false);
+
+    for (auto& [dir, tex] : walkTextures) {
         sf::Vector2u size = tex.getSize();
         int frameCount = 4;
         int frameWidth = size.x / frameCount;
@@ -229,103 +284,150 @@ void Player::createPlaceholderSprites()
         for (int i = 0; i < frameCount; i++) {
             frames.push_back(sf::IntRect(i * frameWidth, 0, frameWidth, size.y));
         }
-        directionFrames[dir] = frames;
+        walkFrames[dir] = frames;
     }
 }
 
 void Player::setDirection(Direction newDirection)
 {
     currentDirection = newDirection;
+    updateTextureForState();
+}
 
-    setTexture(directionTextures[currentDirection]);
+void Player::setState(State newState)
+{
+    if (currentState != newState) {
+        currentState = newState;
+        updateTextureForState();
+    }
+}
 
-    // Użyj metod z AnimatedObject do zarządzania klatkami
-    AnimatedObject::clear();
-    if (directionFrames.find(currentDirection) != directionFrames.end()) {
-        for (const auto& frame : directionFrames[currentDirection]) {
-            AnimatedObject::addFrame(frame);
+void Player::updateTextureForState()
+{
+    if (currentState == State::IDLE) {
+
+        auto it = idleTextures.find(currentDirection);
+        if (it != idleTextures.end()) {
+            setTexture(it->second);
+
+            AnimatedObject::clear();
+            AnimatedObject::addFrame(sf::IntRect(0, 0,
+                static_cast<int>(it->second.getSize().x),
+                static_cast<int>(it->second.getSize().y)));
+            AnimatedObject::reset();
+        }
+    } else {
+
+        auto it = walkTextures.find(currentDirection);
+        if (it != walkTextures.end()) {
+            setTexture(it->second);
+
+            AnimatedObject::clear();
+            auto frameIt = walkFrames.find(currentDirection);
+            if (frameIt != walkFrames.end()) {
+                for (const auto& frame : frameIt->second) {
+                    AnimatedObject::addFrame(frame);
+                }
+            }
+            AnimatedObject::reset();
         }
     }
-
-    AnimatedObject::reset();
 }
 
 void Player::animate(float dt)
 {
-    AnimatedObject::animate(dt);
+
+    if (currentState == State::WALKING) {
+        AnimatedObject::animate(dt);
+    }
 }
 
 void Player::update()
 {
     bool moved = false;
     Direction newDir = currentDirection;
+    State newState = State::IDLE;
 
-    // Update animation using AnimatedObject's method
-    AnimatedObject::animate(0.016f);
-
-    sf::Vector2f oldPosition = getPosition();
     sf::Vector2f movement(0.f, 0.f);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
         movement.y -= speed;
-        newDir = Direction::UP; moved = true;
+        newDir = Direction::UP;
+        moved = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
         movement.y += speed;
-        newDir = Direction::DOWN; moved = true;
+        newDir = Direction::DOWN;
+        moved = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         movement.x -= speed;
-        newDir = Direction::LEFT; moved = true;
+        newDir = Direction::LEFT;
+        moved = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         movement.x += speed;
-        newDir = Direction::RIGHT; moved = true;
+        newDir = Direction::RIGHT;
+        moved = true;
     }
 
-    // Normalize diagonal movement (z drugiego kodu)
+    if (moved) {
+        newState = State::WALKING;
+        idleTimer = 0.f;
+
+    } else {
+
+        idleTimer += 0.016f;
+
+        if (idleTimer >= idleTimeout) {
+            newState = State::IDLE;
+        }
+    }
+
     if (movement.x != 0 && movement.y != 0) {
-        movement.x *= 0.7071f; // sqrt(2)/2
+        movement.x *= 0.7071f;
         movement.y *= 0.7071f;
     }
 
-    sf::Vector2f newPosition = calculateNewPosition(movement);
+    if (newState == State::WALKING) {
+        AnimatedObject::animate(0.016f);
+    }
 
-    // Uproszczona logika ruchu z drugiego kodu
     if (moved) {
+        sf::Vector2f oldPosition = getPosition();
+        sf::Vector2f newPosition = calculateNewPosition(movement);
+
         if (isPositionValid(newPosition)) {
             setPosition(newPosition.x, newPosition.y);
             lastValidPosition = newPosition;
         } else {
-            // Try moving only horizontally
+
             sf::Vector2f horizontalPos = calculateNewPosition(sf::Vector2f(movement.x, 0));
             if (isPositionValid(horizontalPos)) {
                 setPosition(horizontalPos.x, horizontalPos.y);
                 lastValidPosition = horizontalPos;
             } else {
-                // Try moving only vertically
+
                 sf::Vector2f verticalPos = calculateNewPosition(sf::Vector2f(0, movement.y));
                 if (isPositionValid(verticalPos)) {
                     setPosition(verticalPos.x, verticalPos.y);
                     lastValidPosition = verticalPos;
                 } else {
-                    // Stay in place
+
                     setPosition(oldPosition.x, oldPosition.y);
                 }
             }
         }
+    }
 
-        // Change direction if needed
-        if (newDir != currentDirection) {
-            setDirection(newDir);
-        }
+    if (newDir != currentDirection) {
+        setDirection(newDir);
+    }
+
+    if (newState != currentState) {
+        setState(newState);
     }
 }
-
-// Pozostałe metody pozostają bez zmian jak w pierwszym kodzie
-// (getGlobalBounds, setBoundaries, isOutOfBounds, keepInBounds,
-// getPosition, setPosition, checkCollisionWithBounds, clampToBounds,
-// metody hitboxów, funkcje pomocnicze do kolizji, itd.)
 
 sf::FloatRect Player::getGlobalBounds() const {
     return sprite.getGlobalBounds();
@@ -381,7 +483,6 @@ void Player::clampToBounds() {
     setPosition(newPosition.x, newPosition.y);
 }
 
-// Nowe funkcje dla dokładnych hitboxów
 void Player::addCollisionRectangle(const sf::FloatRect& rect) {
     RectangleShape shape;
     shape.rect = rect;
@@ -415,11 +516,8 @@ bool Player::checkCollisionWithShapes() const {
     return false;
 }
 
-// Stare funkcje dla kompatybilności
 void Player::addCollisionObject(const sf::FloatRect& object) {
-    // Dodaj jako prostokąt do nowego systemu
     addCollisionRectangle(object);
-    // I do starego systemu dla kompatybilności
     collisionObjects.push_back(object);
 }
 
@@ -437,7 +535,6 @@ sf::Vector2f Player::calculateNewPosition(const sf::Vector2f& movement) const {
     return sf::Vector2f(currentPos.x + movement.x, currentPos.y + movement.y);
 }
 
-// Funkcje pomocnicze do kolizji (bez zmian)
 bool Player::rectangleIntersectsRect(const sf::FloatRect& rect1, const sf::FloatRect& rect2) {
     return rect1.intersects(rect2);
 }

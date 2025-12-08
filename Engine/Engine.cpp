@@ -36,7 +36,7 @@ bool Engine::init(const std::string& title, unsigned int screenWidth,
     }
 
     window.setFramerateLimit(fps);
-    window.setKeyRepeatEnabled(false); // Better for games
+    window.setKeyRepeatEnabled(false);
 
     log("Engine initialized successfully.");
     log("Resolution: " + std::to_string(screenWidth) + "x" + std::to_string(screenHeight));
@@ -146,7 +146,7 @@ void Engine::handleEvents() {
         }
 
         if (event.type == sf::Event::Resized) {
-            // Update the view to the new size of the window
+
             sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
             window.setView(sf::View(visibleArea));
         }
@@ -155,17 +155,17 @@ void Engine::handleEvents() {
             if (event.key.code == sf::Keyboard::Escape) {
                 isRunning1 = false;
             }
-            // You can add more key handlers here
+
         }
     }
 }
 
 void Engine::update() {
-    // Base update - can be overridden or extended
+
 }
 
 void Engine::render() {
-    // Base render - can be overridden or extended
+
 }
 
 void Engine::mainLoop() {

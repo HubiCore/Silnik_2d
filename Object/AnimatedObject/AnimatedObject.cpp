@@ -44,27 +44,26 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
 
     sf::Vector2u texSize = texture.getSize();
 
-    // Auto-detect frame count if not specified
     if (frameCount <= 0) {
-        // Check for common frame sizes
+
         if (frameWidth <= 0 || frameHeight <= 0) {
-            // Try to detect based on texture dimensions
+
             if (texSize.x % 64 == 0 && texSize.y == 64) {
-                // 64x64 frames (common for character sprites)
+
                 frameCount = texSize.x / 64;
                 frameWidth = 64;
                 frameHeight = 64;
                 std::cout << "Auto-detected: " << frameCount << " frames of 64x64" << std::endl;
             }
             else if (texSize.x % 32 == 0 && texSize.y == 64) {
-                // 32x64 frames (common for tall character sprites)
+
                 frameCount = texSize.x / 32;
                 frameWidth = 32;
                 frameHeight = 64;
                 std::cout << "Auto-detected: " << frameCount << " frames of 32x64" << std::endl;
             }
             else if (texSize.x % 64 == 0) {
-                // 64px wide frames, any height
+
                 frameCount = texSize.x / 64;
                 frameWidth = 64;
                 frameHeight = texSize.y;
@@ -72,7 +71,7 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
                           << frameWidth << "x" << frameHeight << std::endl;
             }
             else if (texSize.x % 32 == 0) {
-                // 32px wide frames, any height
+
                 frameCount = texSize.x / 32;
                 frameWidth = 32;
                 frameHeight = texSize.y;
@@ -80,7 +79,7 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
                           << frameWidth << "x" << frameHeight << std::endl;
             }
             else {
-                // Default: 4 frames
+
                 frameCount = 4;
                 frameWidth = texSize.x / frameCount;
                 frameHeight = texSize.y;
@@ -90,7 +89,7 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
         }
     }
     else {
-        // Use specified frame count
+
         if (frameWidth <= 0) {
             frameWidth = texSize.x / frameCount;
         }
@@ -99,7 +98,6 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
         }
     }
 
-    // Create frames
     for (int i = 0; i < frameCount; i++) {
         frames.emplace_back(i * frameWidth, 0, frameWidth, frameHeight);
     }
@@ -121,7 +119,8 @@ bool AnimatedObject::loadSpriteSheetAuto(const std::string& filename)
 void AnimatedObject::addFrame(const sf::IntRect& frame)
 {
     frames.push_back(frame);
-    updateSprite(); // Update sprite with current frame
+    updateSprite();
+
 }
 
 void AnimatedObject::animate(float dt)
@@ -134,7 +133,8 @@ void AnimatedObject::animate(float dt)
     {
         frameTimer = 0.f;
         advanceFrame();
-        updateSprite(); // Update sprite after advancing frame
+        updateSprite();
+
     }
 }
 
@@ -148,7 +148,8 @@ void AnimatedObject::setCurrentFrame(int frame)
 
 void AnimatedObject::updateSpriteFrame()
 {
-    updateSprite(); // Just use the public method
+    updateSprite();
+
 }
 
 void AnimatedObject::advanceFrame()

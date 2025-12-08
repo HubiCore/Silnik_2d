@@ -124,13 +124,6 @@ int main() {
     }
 
     engine.log("");
-    engine.log("HITBOX SYSTEM:");
-    engine.log("  - Points:      Small circles (5px radius)");
-    engine.log("  - Lines:       Thin rotated rectangles (2px)");
-    engine.log("  - Circles:     Perfect circles");
-    engine.log("  - Ellipses:    Polygon approximations (32 segments)");
-    engine.log("  - Polygons:    Exact shapes");
-    engine.log("");
     engine.log("CONTROLS:");
     engine.log("  - Movement:    W, A, S, D");
     engine.log("  - Animation:   Automatic based on movement");
