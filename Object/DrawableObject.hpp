@@ -1,43 +1,39 @@
 /**
-* @file ShapeObject.hpp
- * @brief Deklaracja klasy bazowej ShapeObject
- * @ingroup ShapeObject
+* @file DrawableObject.hpp
+ * @brief Deklaracja klasy DrawableObject
+ * @ingroup DrawableObject
  *
- * Klasa ShapeObject stanowi interfejs bazowy dla wszystkich kształtów geometrycznych.
- * Łączy funkcjonalności rysowania i transformacji poprzez wirtualne dziedziczenie.
+ * Klasa DrawableObject definiuje interfejs dla obiektów, które mogą być rysowane.
+ * Rozszerza klasę GameObject o możliwość renderowania przez PrimitiveRenderer.
  */
 
-#ifndef SHAPEOBJECT_HPP
-#define SHAPEOBJECT_HPP
+#ifndef DRAWABLEOBJECT_HPP
+#define DRAWABLEOBJECT_HPP
 
-#include "DrawableObject.hpp"
-#include "TransformableObject.hpp"
+#include "GameObject/GameObjects.hpp"
+#include "Renderer/PrimitiveRenderer.hpp"
 
 /**
- * @class ShapeObject
- * @brief Abstrakcyjna klasa bazowa dla obiektów kształtów
+ * @class DrawableObject
+ * @brief Abstrakcyjna klasa bazowa dla obiektów rysowalnych
  *
- * Klasa łączy interfejsy DrawableObject i TransformableObject poprzez wirtualne dziedziczenie,
- * co umożliwia poprawne działanie mechanizmu diamentowego dziedziczenia w hierarchii obiektów.
- * Wszystkie klasy reprezentujące kształty geometryczne powinny dziedziczyć po tej klasie.
- *
- * @note Klasa używa wirtualnego dziedziczenia, aby uniknąć problemów z wielokrotnym
- *       dziedziczeniem tej samej klasy bazowej w złożonych hierarchiach.
+ * Klasa rozszerza interfejs GameObject o możliwość renderowania na ekranie.
+ * Każdy obiekt, który ma być wyświetlany, powinien implementować ten interfejs.
+ * Wykorzystuje wirtualne dziedziczenie, aby umożliwić poprawne wielokrotne dziedziczenie.
  */
-class ShapeObject :
-        public virtual DrawableObject,
-        public virtual TransformableObject {
+class DrawableObject : public virtual GameObject {
 public:
     /**
-     * @brief Wirtualny destruktor
+     * @brief Rysuje obiekt na rendererze
+     * @param renderer Referencja do renderera prymitywów
      *
-     * Zapewnia prawidłowe niszczenie obiektów pochodnych.
-     * Destruktor jest domyślny i wirtualny.
+     * Metoda czysto wirtualna, która musi być zaimplementowana przez klasy pochodne.
+     * Odpowiada za renderowanie obiektu na ekranie przy użyciu dostarczonego renderera.
      */
-    virtual ~ShapeObject() = default;
-
-    // Klasa jest czysto interfejsowa - nie dodaje nowych metod,
-    // ale łączy istniejące interfejsy przez wielokrotne dziedziczenie.
+    virtual void draw(PrimitiveRenderer& renderer) = 0;
 };
 
 #endif
+
+
+
