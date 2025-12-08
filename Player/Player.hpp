@@ -8,6 +8,7 @@
 #include "../Object/sprite/SpriteObject.hpp"
 #include "../Object/AnimatedObject/AnimatedObject.hpp"
 
+
 class Player : public SpriteObject, public AnimatedObject {
 public:
     enum class Direction { UP, DOWN, LEFT, RIGHT };
@@ -32,7 +33,13 @@ public:
     Player(float x, float y, float speed);
     void update() override;
     void setDirection(Direction newDirection);
+
+    // Metody ładowania tekstur
     bool loadSprites(const std::string& folder);
+    bool loadAnimatedSprites(const std::string& folder);
+    bool loadSpriteSheets(const std::string& folder);
+    bool loadSpriteSheet(Direction dir, const std::string& filename, int frameCount = 0);
+
     void createPlaceholderSprites();
     sf::FloatRect getGlobalBounds() const;
     void setBoundaries(const sf::FloatRect& newBoundaries);
@@ -53,8 +60,19 @@ public:
     void clearCollisionObjects();
     bool checkCollisionWithObjects() const;
 
-    bool loadAnimatedSprites(const std::string& folder);
+    // Animacja
     void animate(float dt) override;
+
+    // Dostęp do informacji o animacji (przekierowanie do AnimatedObject)
+    int getCurrentFrame() const { return AnimatedObject::getCurrentFrame(); }
+    int getFrameCount() const { return AnimatedObject::getFrameCount(); }
+    float getFrameTime() const { return AnimatedObject::getFrameTime(); }
+    void setFrameTime(float time) { AnimatedObject::setFrameTime(time); }
+    void resetAnimation() { AnimatedObject::reset(); }
+
+    // Pobranie sprite'a
+    sf::Sprite& getSprite() { return *anim; }  // anim jest wskaźnikiem w AnimatedObject
+    const sf::Sprite& getSprite() const { return *anim; }
 
 private:
     float speed;
@@ -69,10 +87,6 @@ private:
     std::vector<sf::FloatRect> collisionObjects;
 
     std::map<Direction, std::vector<sf::IntRect>> directionFrames;
-    std::vector<sf::IntRect> frames;
-    int currentFrame = 0;
-    float frameTimer = 0.f;
-    float frameTime = 0.15f;
 
     bool checkCollisionWithBounds() const;
     void clampToBounds();
