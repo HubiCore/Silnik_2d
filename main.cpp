@@ -146,6 +146,7 @@ int main() {
     sf::Clock clock;
     float fpsUpdateTimer = 0.f;
     int frameCount = 0;
+    buffer.clear(sf::Color(50, 50, 50));
 
     // MAIN GAME LOOP
     while (window->isOpen()) {
@@ -178,7 +179,6 @@ int main() {
                 int mouseY = event.mouseButton.y;
 
                 // Draw everything to buffer
-                buffer.clear(sf::Color(50, 50, 50));
                 PrimitiveRenderer bufferRenderer(&buffer);
                 drawAllFigures(bufferRenderer, player);
 
@@ -248,7 +248,6 @@ int main() {
         }
 
         // Draw current frame to buffer (all figures including player)
-        buffer.clear(sf::Color(50, 50, 50));
         PrimitiveRenderer bufferRenderer(&buffer);
         drawAllFigures(bufferRenderer, player);
         buffer.display();
