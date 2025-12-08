@@ -1,8 +1,25 @@
+/**
+ * @file AnimatedObject.cpp
+ * @brief Implementacja klasy AnimatedObject
+ * @ingroup AnimatedObject
+ *
+ * Implementacja metod klasy AnimatedObject zdefiniowanych w AnimatedObject.hpp.
+ * Zawiera logikę ładowania animacji z plików i arkuszy sprite'ów oraz zarządzania klatkami.
+ */
+
 #include "AnimatedObject.hpp"
 #include <filesystem>
 #include <iostream>
 #include <cmath>
 
+/**
+ * @brief Ładuje animację z pojedynczych plików w folderze
+ * @param folder Ścieżka do folderu z plikami klatek (nazwy: 0.png, 1.png, ...)
+ * @return true jeśli załadowano przynajmniej jedną klatkę, false w przeciwnym razie
+ *
+ * Metoda oczekuje plików o nazwach "0.png", "1.png", itd. w podanym folderze.
+ * Ładuje je kolejno aż do napotkania braku pliku. Każdy plik staje się osobną klatką.
+ */
 bool AnimatedObject::loadAnimatedSprites(const std::string& folder)
 {
     frames.clear();
@@ -25,6 +42,17 @@ bool AnimatedObject::loadAnimatedSprites(const std::string& folder)
     return !frames.empty();
 }
 
+/**
+ * @brief Ładuje animację z arkusza sprite'ów (spritesheet)
+ * @param filename Ścieżka do pliku arkusza sprite'ów
+ * @param frameCount Liczba klatek w arkuszu (0 = automatyczne wykrywanie)
+ * @param frameWidth Szerokość pojedynczej klatki (0 = automatyczne wykrywanie)
+ * @param frameHeight Wysokość pojedynczej klatki (0 = automatyczne wykrywanie)
+ * @return true jeśli załadowano pomyślnie, false w przeciwnym razie
+ *
+ * Metoda obsługuje automatyczne wykrywanie parametrów dla typowych rozmiarów klatek
+ * (64x64, 32x64, itp.). Jeśli parametry są podane, używa ich bez auto-detekcji.
+ */
 bool AnimatedObject::loadSpriteSheet(const std::string& filename,
                                      int frameCount,
                                      int frameWidth,
@@ -44,27 +72,26 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
 
     sf::Vector2u texSize = texture.getSize();
 
-    // Auto-detect frame count if not specified
     if (frameCount <= 0) {
-        // Check for common frame sizes
+
         if (frameWidth <= 0 || frameHeight <= 0) {
-            // Try to detect based on texture dimensions
+
             if (texSize.x % 64 == 0 && texSize.y == 64) {
-                // 64x64 frames (common for character sprites)
+
                 frameCount = texSize.x / 64;
                 frameWidth = 64;
                 frameHeight = 64;
                 std::cout << "Auto-detected: " << frameCount << " frames of 64x64" << std::endl;
             }
             else if (texSize.x % 32 == 0 && texSize.y == 64) {
-                // 32x64 frames (common for tall character sprites)
+
                 frameCount = texSize.x / 32;
                 frameWidth = 32;
                 frameHeight = 64;
                 std::cout << "Auto-detected: " << frameCount << " frames of 32x64" << std::endl;
             }
             else if (texSize.x % 64 == 0) {
-                // 64px wide frames, any height
+
                 frameCount = texSize.x / 64;
                 frameWidth = 64;
                 frameHeight = texSize.y;
@@ -72,7 +99,7 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
                           << frameWidth << "x" << frameHeight << std::endl;
             }
             else if (texSize.x % 32 == 0) {
-                // 32px wide frames, any height
+
                 frameCount = texSize.x / 32;
                 frameWidth = 32;
                 frameHeight = texSize.y;
@@ -80,7 +107,7 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
                           << frameWidth << "x" << frameHeight << std::endl;
             }
             else {
-                // Default: 4 frames
+
                 frameCount = 4;
                 frameWidth = texSize.x / frameCount;
                 frameHeight = texSize.y;
@@ -90,7 +117,7 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
         }
     }
     else {
-        // Use specified frame count
+
         if (frameWidth <= 0) {
             frameWidth = texSize.x / frameCount;
         }
@@ -99,7 +126,6 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
         }
     }
 
-    // Create frames
     for (int i = 0; i < frameCount; i++) {
         frames.emplace_back(i * frameWidth, 0, frameWidth, frameHeight);
     }
@@ -113,17 +139,40 @@ bool AnimatedObject::loadSpriteSheet(const std::string& filename,
     return true;
 }
 
+/**
+ * @brief Ładuje arkusz sprite'ów z automatycznym wykrywaniem parametrów
+ * @param filename Ścieżka do pliku arkusza sprite'ów
+ * @return true jeśli załadowano pomyślnie, false w przeciwnym razie
+ *
+ * Wrapper wywołujący loadSpriteSheet z domyślnymi parametrami (0,0,0)
+ * co wymusza automatyczne wykrywanie liczby klatek i ich rozmiarów.
+ */
 bool AnimatedObject::loadSpriteSheetAuto(const std::string& filename)
 {
     return loadSpriteSheet(filename, 0, 0, 0);
 }
 
+/**
+ * @brief Dodaje ręcznie zdefiniowaną klatkę
+ * @param frame Prostokąt definiujący klatkę w teksturze
+ *
+ * Metoda pozwala na ręczne dodawanie klatek, np. gdy arkusz sprite'ów
+ * ma nieregularny układ lub gdy chcemy użyć tylko wybranych klatek.
+ */
 void AnimatedObject::addFrame(const sf::IntRect& frame)
 {
     frames.push_back(frame);
-    updateSprite(); // Update sprite with current frame
+    updateSprite();
+
 }
 
+/**
+ * @brief Aktualizuje animację w czasie
+ * @param dt Czas, który upłynął od ostatniej aktualizacji (w sekundach)
+ *
+ * Metoda powinna być wywoływana w każdej klatce gry. Aktualizuje licznik czasu
+ * i przechodzi do następnej klatki gdy frameTimer przekroczy frameTime.
+ */
 void AnimatedObject::animate(float dt)
 {
     if (frames.empty() || anim == nullptr || !playing)
@@ -134,10 +183,17 @@ void AnimatedObject::animate(float dt)
     {
         frameTimer = 0.f;
         advanceFrame();
-        updateSprite(); // Update sprite after advancing frame
+        updateSprite();
+
     }
 }
 
+/**
+ * @brief Ustawia aktualną klatkę animacji
+ * @param frame Indeks klatki do ustawienia
+ *
+ * Metoda sprawdza poprawność indeksu i aktualizuje sprite'a do wybranej klatki.
+ */
 void AnimatedObject::setCurrentFrame(int frame)
 {
     if (isValidFrameIndex(frame)) {
@@ -146,11 +202,24 @@ void AnimatedObject::setCurrentFrame(int frame)
     }
 }
 
+/**
+ * @brief Aktualizuje sprite'a do aktualnej klatki (metoda wirtualna)
+ *
+ * Metoda wirtualna pozwalająca na rozszerzenie funkcjonalności aktualizacji
+ * sprite'a w klasach pochodnych. Domyślnie wywołuje updateSprite().
+ */
 void AnimatedObject::updateSpriteFrame()
 {
-    updateSprite(); // Just use the public method
+    updateSprite();
+
 }
 
+/**
+ * @brief Przechodzi do następnej klatki (metoda wirtualna)
+ *
+ * Metoda wirtualna zarządzająca przejściem do następnej klatki.
+ * Uwzględnia zapętlanie i ustawia flagę finished gdy animacja się kończy.
+ */
 void AnimatedObject::advanceFrame()
 {
     if (frames.empty()) return;

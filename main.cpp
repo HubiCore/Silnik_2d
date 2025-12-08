@@ -1,3 +1,27 @@
+/**
+ * @file main.cpp
+ * @brief Główny punkt wejścia programu 2D Engine z animowanym graczem
+ * @mainpage 2D Engine z Animowanym Graczem
+ *
+ * @section intro_sec Wprowadzenie
+ * Program implementuje interaktywny silnik graficzny 2D z animowanym graczem,
+ * obsługą klawiatury, myszy oraz algorytmami wypełniania obszarów.
+ *
+ * @section features_sec Funkcje
+ * - Animacja sprite'ów gracza w 4 kierunkach
+ * - Wypełnianie obszarów (flood fill i boundary fill)
+ * - System kolizji i hitboxów
+ * - Renderowanie przez bufor tekstury
+ * - Rozbudowany system debugowania
+ * - Obsługa różnych formatów sprite'ów
+ *
+ * @author Autor programu
+ * @date 2024
+ * @version 1.0
+ *
+ * @copyright MIT License
+ */
+
 #include "Engine/Engine.hpp"
 #include "Object/Renderer/PrimitiveRenderer.hpp"
 #include "Figures/Point2D/Point2D.hpp"
@@ -14,6 +38,32 @@
 // MAIN FUNCTION - PROGRAM ENTRY POINT
 // ============================================================================
 
+/**
+ * @brief Główna funkcja programu
+ *
+ * Funkcja inicjalizuje silnik graficzny, tworzy obiekt gracza, ładuje zasoby,
+ * zarządza główną pętlą gry oraz obsługuje zdarzenia wejścia.
+ *
+ * @return int Kod zakończenia programu:
+ *         - 0: Sukces
+ *         - -1: Błąd inicjalizacji silnika
+ *
+ * @details Sekwencja działania:
+ * 1. Inicjalizacja silnika graficznego
+ * 2. Konfiguracja okna i renderera
+ * 3. Tworzenie obiektu gracza i ładowanie sprite'ów
+ * 4. Konfiguracja animacji i wyświetlenie informacji
+ * 5. Główna pętla gry z obsługą zdarzeń
+ * 6. Czyszczenie zasobów i zakończenie programu
+ *
+ * @note Wymaga biblioteki SFML do działania
+ * @warning W przypadku braku sprite'ów używane są placeholder'y
+ *
+ * @see Engine
+ * @see Player
+ * @see PrimitiveRenderer
+ * @see drawAllFigures()
+ */
 int main() {
     // Initialize graphics engine
     Engine engine;
@@ -123,13 +173,6 @@ int main() {
         engine.log("USING PLACEHOLDER ANIMATIONS (4 frames per direction)");
     }
 
-    engine.log("");
-    engine.log("HITBOX SYSTEM:");
-    engine.log("  - Points:      Small circles (5px radius)");
-    engine.log("  - Lines:       Thin rotated rectangles (2px)");
-    engine.log("  - Circles:     Perfect circles");
-    engine.log("  - Ellipses:    Polygon approximations (32 segments)");
-    engine.log("  - Polygons:    Exact shapes");
     engine.log("");
     engine.log("CONTROLS:");
     engine.log("  - Movement:    W, A, S, D");
