@@ -95,7 +95,7 @@ int main() {
     sf::FloatRect gameBounds(0, 0, 800, 600);
 
     // Create player
-    Player player(400.f, 300.f, 5.0f);
+    Player player(000.f, 500.f, 5.0f);
     player.setBoundaries(gameBounds);
 
     // Try to load animated sprite sheets
@@ -189,7 +189,6 @@ int main() {
     sf::Clock clock;
     float fpsUpdateTimer = 0.f;
     int frameCount = 0;
-    buffer.clear(sf::Color(50, 50, 50));
 
     // MAIN GAME LOOP
     while (window->isOpen()) {
@@ -222,21 +221,15 @@ int main() {
                 int mouseY = event.mouseButton.y;
 
                 // Draw everything to buffer
+                buffer.clear(sf::Color(50, 50, 50));
                 PrimitiveRenderer bufferRenderer(&buffer);
                 drawAllFigures(bufferRenderer, player);
 
                 // Fill based on mouse button
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    bufferRenderer.floodFill0(mouseX, mouseY, sf::Color::Blue, sf::Color(50, 50, 50));
-                    engine.log("Flood fill at (" + std::to_string(mouseX) + ", " +
+                    engine.log("Mouse posision at: (" + std::to_string(mouseX) + ", " +
                                std::to_string(mouseY) + ")");
                 }
-                else if (event.mouseButton.button == sf::Mouse::Right) {
-                    bufferRenderer.boundaryFillIterative0(mouseX, mouseY, sf::Color::Yellow, sf::Color::Red);
-                    engine.log("Boundary fill at (" + std::to_string(mouseX) + ", " +
-                               std::to_string(mouseY) + ")");
-                }
-
                 buffer.display();
             }
 
@@ -291,6 +284,7 @@ int main() {
         }
 
         // Draw current frame to buffer (all figures including player)
+        buffer.clear(sf::Color(50, 50, 50));
         PrimitiveRenderer bufferRenderer(&buffer);
         drawAllFigures(bufferRenderer, player);
         buffer.display();
